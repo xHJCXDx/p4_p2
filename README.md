@@ -9,50 +9,50 @@
 
 ## Novedades en Parcial 2 vs TP Integrador (P4_P1)
 
-### 🔐 Autenticación y Autorización
+### Autenticación y Autorización
 - **JWT + RBAC**: Autenticación basada en tokens con roles y permisos
 - **Módulo Usuario**: Registro, login, gestión de usuarios
 - **Roles del Sistema**: ADMIN, GERENTE, REPARTIDOR, CLIENTE
 - **Protección de rutas**: Endpoints protegidos con decoradores `@require_auth`, `@require_role`
 - **Seed automático**: Usuario ADMIN por defecto (admin@admin.com / admin123)
 
-### 📦 Gestión de Pedidos Completa
-- **FSM (Finite State Machine)**: Transiciones de estado validadas (PENDIENTE → CONFIRMADO → EN_PREP → EN_CAMINO → ENTREGADO)
+### Gestión de Pedidos Completa
+- **FSM (Finite State Machine)**: Transiciones de estado validadas (PENDIENTE -> CONFIRMADO -> EN_PREP -> EN_CAMINO -> ENTREGADO)
 - **Snapshots de precios**: Copia immutable de precios/nombres en momentos de compra
 - **Detalles de pedido**: Relación con productos + descuentos + variaciones
 - **Sistema de pagos**: Integración con MercadoPago (estructura lista)
 - **Formas de pago**: MERCADOPAGO, EFECTIVO, TRANSFERENCIA
 
-### 🏠 Direcciones y Entregas
+### Direcciones y Entregas
 - **Módulo Dirección**: CRUD de direcciones de usuario
 - **Validación de entregas**: Campos requeridos (calle, número, ciudad, etc.)
 - **Múltiples direcciones por usuario**: Soporte para direcciones de envío diferentes
 
-### 👨‍💼 Panel Administrativo
+### Panel Administrativo
 - **Módulo Admin**: Endpoints protegidos solo para ADMIN
 - **Gestión global**: Visualizar/editar pedidos, usuarios, productos
 - **Reportes**: Estadísticas de ventas, pedidos por estado
 
-### 🛍️ Tienda Pública
+### Tienda Pública
 - **HomeStorePage**: Catálogo de productos con filtros
 - **CarritoPage**: Carrito de compras con Zustand (state management)
 - **CheckoutPage**: Flujo de compra completo
 - **MisPedidosPage**: Historial de pedidos del usuario
 
-### 🏗️ Mejoras Arquitectónicas
+### Mejoras Arquitectónicas
 - **Unit of Work Pattern**: Transacciones atómicas, control de cambios
 - **Repository Pattern**: Abstracción de acceso a datos
 - **Service Layer**: Lógica de negocio centralizada
 - **Schemas Pydantic**: Validación automática de datos
 - **Response Envelope**: Respuestas estandarizadas en todos los endpoints
 
-### 📊 Base de Datos
+### Base de Datos
 - **SQLModel**: Modelos híbridos (SQLAlchemy ORM + Pydantic)
 - **Soft Deletes**: Registros marcados `deleted_at` en lugar de borrados
 - **Auditoría**: `created_at`, `updated_at`, `deleted_at` en todas las tablas
-- **Relaciones complejas**: Many-to-Many (Producto↔Categoría, Producto↔Ingrediente), FK, auto-referencia
+- **Relaciones complejas**: Many-to-Many (Producto-Categoría, Producto-Ingrediente), FK, auto-referencia
 
-### 🎨 Frontend Moderno
+### Frontend Moderno
 - **React 18 + TypeScript + Vite**
 - **Zustand**: State management para carrito y auth
 - **React Router v6**: Rutas protegidas con ProtectedRoute
@@ -60,14 +60,14 @@
 - **Hooks personalizados**: `useCategorias`, `useProductos`, `usePedidos`, `useIngredientes`
 - **Componentes reutilizables**: Navbar, CategoriaCard, ProductoTable, PedidoTable, Modales, etc.
 
-### 🔧 Refactoring y Mejoras de Código
+### Refactoring y Mejoras de Código
 - **Limpieza de routers**: Eliminación de lógica redundante
-- **Separación de concerns**: Routers → Services → Repository
+- **Separación de concerns**: Routers -> Services -> Repository
 - **UoW context manager**: Manejo eficiente de transacciones
 - **BaseRepository**: Métodos genéricos reutilizables
 - **Seed data**: Sistema automático de datos iniciales
 
-### 📋 Prefijo de API
+### Prefijo de API
 - Todos los endpoints ahora usan `/api/v1/` como prefijo (versionamiento)
 - Ejemplo: `GET /api/v1/productos`, `POST /api/v1/pedidos`
 
@@ -221,20 +221,20 @@ La aplicación estará disponible en `http://localhost:5173`
 
 ### Backend (FastAPI) - Parcial 2
 
-#### 🔐 Autenticación y Autorización
-- ✅ **JWT Token-based Auth**
+#### Autenticación y Autorización
+- **JWT Token-based Auth**
   - `POST /api/v1/auth/register` - Registrar nuevo usuario
   - `POST /api/v1/auth/login` - Login (retorna access_token)
   - `POST /api/v1/auth/refresh` - Refrescar token expirado
   - `POST /api/v1/auth/logout` - Logout (invalida token)
 
-- ✅ **RBAC (Role-Based Access Control)**
+- **RBAC (Role-Based Access Control)**
   - Roles: ADMIN, GERENTE, REPARTIDOR, CLIENTE
   - Seed automático de roles obligatorios
   - Usuario ADMIN por defecto (admin@admin.com / admin123)
   - Decoradores: `@require_auth`, `@require_role("ADMIN")`
 
-#### 📦 CRUD Categorías (Parcial 1 + mejoras)
+#### CRUD Categorías (Parcial 1 + mejoras)
 - `GET /api/v1/categorias?limit=10&offset=0` - Listar con paginación
 - `GET /api/v1/categorias/{id}` - Obtener por ID
 - `POST /api/v1/categorias` - Crear nueva (solo ADMIN)
@@ -242,7 +242,7 @@ La aplicación estará disponible en `http://localhost:5173`
 - `DELETE /api/v1/categorias/{id}` - Soft delete (solo ADMIN)
 - **Nuevo**: Auto-referencia con `parent_id` (subcategorías)
 
-#### 📦 CRUD Productos (Parcial 1 + mejoras)
+#### CRUD Productos (Parcial 1 + mejoras)
 - `GET /api/v1/productos?limit=10&offset=0` - Listar con paginación, filtros
 - `GET /api/v1/productos/{id}` - Obtener por ID
 - `POST /api/v1/productos` - Crear nuevo (solo ADMIN)
@@ -250,7 +250,7 @@ La aplicación estará disponible en `http://localhost:5173`
 - `DELETE /api/v1/productos/{id}` - Soft delete (solo ADMIN)
 - **Nuevo**: Relaciones Many-to-Many con Ingredientes
 
-#### 🌶️ CRUD Ingredientes (Nuevo en Parcial 2)
+#### CRUD Ingredientes (Nuevo en Parcial 2)
 - `GET /api/v1/ingredientes?limit=10&offset=0` - Listar con paginación
 - `GET /api/v1/ingredientes/{id}` - Obtener por ID
 - `POST /api/v1/ingredientes` - Crear nuevo (solo ADMIN)
@@ -258,7 +258,7 @@ La aplicación estará disponible en `http://localhost:5173`
 - `DELETE /api/v1/ingredientes/{id}` - Hard delete (sin soft delete)
 - **Soporte**: Campo `es_alergeno` para alertas
 
-#### 📋 CRUD Pedidos (Nuevo en Parcial 2)
+#### CRUD Pedidos (Nuevo en Parcial 2)
 - `GET /api/v1/pedidos?limit=10&offset=0` - Listar con paginación
 - `GET /api/v1/pedidos/{id}` - Obtener por ID con detalles completos
 - `POST /api/v1/pedidos` - Crear nuevo pedido (solo CLIENTE)
@@ -271,30 +271,30 @@ La aplicación estará disponible en `http://localhost:5173`
 - `POST /api/v1/pedidos/{id}/pagos` - Registrar pago (MercadoPago)
 - `PUT /api/v1/pedidos/{id}/pagos/{pago_id}` - Actualizar pago
 
-#### 🏠 CRUD Direcciones (Nuevo en Parcial 2)
+#### CRUD Direcciones (Nuevo en Parcial 2)
 - `GET /api/v1/usuarios/{usuario_id}/direcciones` - Listar direcciones del usuario
 - `POST /api/v1/usuarios/{usuario_id}/direcciones` - Crear nueva dirección
 - `PUT /api/v1/direcciones/{id}` - Actualizar dirección
 - `DELETE /api/v1/direcciones/{id}` - Eliminar dirección
 - **Validación**: Calle, número, departamento, ciudad, código postal, provincia
 
-#### 👨‍💼 Admin Panel (Nuevo en Parcial 2)
+#### Admin Panel (Nuevo en Parcial 2)
 - `GET /api/v1/admin/estadisticas` - Estadísticas globales (solo ADMIN)
 - `GET /api/v1/admin/usuarios` - Listar todos los usuarios (solo ADMIN)
 - `PUT /api/v1/admin/usuarios/{id}/roles` - Asignar/remover roles (solo ADMIN)
 - `GET /api/v1/admin/pedidos` - Ver todos los pedidos sin filtro (solo ADMIN)
 
-#### 🛍️ Catálogos (Nuevo en Parcial 2)
+#### Catálogos (Nuevo en Parcial 2)
 - **FormaPago**: MERCADOPAGO, EFECTIVO, TRANSFERENCIA
 - **EstadoPedido**: PENDIENTE, CONFIRMADO, EN_PREP, EN_CAMINO, ENTREGADO, CANCELADO
 - **Estados**: Seed automático al iniciar la aplicación
 
-#### 🏗️ Características Técnicas
+#### Características Técnicas
 - **Paginación**: Query params `limit` (1-100, default 10) y `offset` (default 0)
 - **Respuestas estandarizadas**: `{ success, message, data, status_code }`
 - **Soft Delete**: Registros marcados con `deleted_at` (excepto Ingredientes)
 - **Auditoría**: `created_at`, `updated_at`, `deleted_at` en todas las tablas
-- **Relaciones**: Many-to-Many (Producto↔Categoría, Producto↔Ingrediente), Auto-referencia (Categoría)
+- **Relaciones**: Many-to-Many (Producto-Categoría, Producto-Ingrediente), Auto-referencia (Categoría)
 - **CORS**: Configurado para localhost:5173
 - **Docs automáticos**: Swagger en `/api/v1/docs`
 - **FSM**: Validación automática de transiciones de estado en Pedidos
@@ -305,7 +305,7 @@ La aplicación estará disponible en `http://localhost:5173`
 
 ### Frontend (React + TypeScript) - Parcial 2
 
-#### 🗺️ Routing con React Router v6
+#### Routing con React Router v6
 - **Rutas Públicas**:
   - `/` - Redirige a `/store/home`
   - `/store/home` - Catálogo de productos (HomeStorePage)
@@ -325,7 +325,7 @@ La aplicación estará disponible en `http://localhost:5173`
   - `/auth/login` - Formulario de login
   - `/auth/register` - Formulario de registro
 
-#### 🛍️ Tienda Pública (Nuevo en Parcial 2)
+#### Tienda Pública (Nuevo en Parcial 2)
 - **HomeStorePage**
   - Catálogo responsivo de productos
   - Filtros por categoría
@@ -339,7 +339,7 @@ La aplicación estará disponible en `http://localhost:5173`
   - Cantidad ajustable por item
   - Subtotal por item y total general
   - Botón "Proceder al checkout"
-  - Carrito vacío → redirige a HomeStorePage
+  - Carrito vacío - redirige a HomeStorePage
 
 - **CheckoutPage**
   - Resumen de compra
@@ -355,7 +355,7 @@ La aplicación estará disponible en `http://localhost:5173`
   - Filtros por estado
   - Paginación
 
-#### 👨‍💼 Panel Administrativo (Nuevo en Parcial 2)
+#### Panel Administrativo (Nuevo en Parcial 2)
 **Gestión de Categorías (CategoriasPage)**
 - CRUD completo (Create, Read, Update, Delete)
 - Modal para crear/editar
@@ -371,7 +371,7 @@ La aplicación estará disponible en `http://localhost:5173`
 
 **Gestión de Ingredientes (IngredientesPage)**
 - CRUD completo
-- Indicadores visuales para alergenos (⚠️ o ✓)
+- Indicadores visuales para alergenos
 - Tabla con propiedades
 
 **PedidosPageRefactored**
@@ -381,7 +381,7 @@ La aplicación estará disponible en `http://localhost:5173`
 - Detalles del pedido (productos + precios)
 - Manejo de paginación
 
-#### 🔐 Autenticación y Protección (Nuevo en Parcial 2)
+#### Autenticación y Protección (Nuevo en Parcial 2)
 - **Auth Store (Zustand)**
   - `useAuthStore`: Estado global de autenticación
   - Token JWT almacenado en localStorage
@@ -400,7 +400,7 @@ La aplicación estará disponible en `http://localhost:5173`
   - Links a admin si es ADMIN
   - Estilos hover y animaciones
 
-#### 🛒 State Management (Zustand)
+#### State Management (Zustand)
 - **useCarritoStore**: Gestión del carrito
   - Agregar/remover items
   - Actualizar cantidades
@@ -412,13 +412,13 @@ La aplicación estará disponible en `http://localhost:5173`
   - Login/logout/register
   - Validar autenticación
 
-#### 🪝 Custom Hooks (Nuevo en Parcial 2)
+#### Custom Hooks (Nuevo en Parcial 2)
 - `useCategorias`: Cargar categorías con paginación
 - `useProductos`: Cargar productos con filtros
 - `useIngredientes`: Cargar ingredientes
 - `usePedidos`: Cargar pedidos del usuario
 
-#### 🎨 Componentes Reutilizables
+#### Componentes Reutilizables
 - **Navbar**: Navegación principal con links dinámicos
 - **CategoriaCard**: Card de categoría
 - **ProductoTable/ProductoModal**: CRUD de productos
@@ -427,7 +427,7 @@ La aplicación estará disponible en `http://localhost:5173`
 - **ProtectedRoute**: Protección de rutas por auth + rol
 - **Modales genéricos**: Para crear/editar items
 
-#### 🎨 Diseño con Tailwind CSS
+#### Diseño con Tailwind CSS
 - Componentes responsivos (mobile-first)
 - Tema profesional blue/gray
 - Validación en formularios
@@ -506,7 +506,7 @@ Incluye ejemplos de:
 ### Jerarquía de Categorías
 - Campo `parent_id` permite categorías padre/hijas
 - Auto-referencia en la tabla Categoria
-- Ejemplo: "Alimentos" (padre) → "Bebidas" (hija)
+- Ejemplo: "Alimentos" (padre) -> "Bebidas" (hija)
 
 ---
 
@@ -514,26 +514,26 @@ Incluye ejemplos de:
 
 | Feature | P4_P1 (TP Integrador) | P4_P2 (Parcial 2) |
 |---------|----------------------|-------------------|
-| **Autenticación** | ❌ No | ✅ JWT + RBAC |
-| **Usuarios y Roles** | ❌ No | ✅ ADMIN, GERENTE, REPARTIDOR, CLIENTE |
-| **Categorías** | ✅ CRUD básico | ✅ CRUD + Jerarquía (parent_id) |
-| **Productos** | ✅ CRUD básico | ✅ CRUD + Relaciones M2M |
-| **Ingredientes** | ❌ No | ✅ CRUD + Alergenos |
-| **Pedidos** | ❌ No | ✅ CRUD + FSM + Snapshots + Pagos |
-| **Direcciones** | ❌ No | ✅ CRUD + Validación |
-| **Admin Panel** | ❌ No | ✅ Estadísticas + Gestión global |
-| **Tienda Pública** | ❌ No | ✅ HomeStore + Carrito + Checkout |
-| **State Management** | ❌ No | ✅ Zustand (Auth + Carrito) |
-| **Custom Hooks** | ❌ No | ✅ useCategorias, useProductos, etc. |
-| **ProtectedRoute** | ❌ No | ✅ Validación Auth + Rol |
-| **Frontend Routing** | ❌ Básico | ✅ React Router v6 con guards |
-| **API Versionamiento** | ❌ `/categorias` | ✅ `/api/v1/categorias` |
-| **Unit of Work** | ❌ No | ✅ Context manager |
-| **Repository Pattern** | ❌ No | ✅ BaseRepository genérico |
-| **Soft Deletes** | ✅ Sí | ✅ Sí (mejorado) |
-| **Response Envelope** | ✅ Básico | ✅ StandardResponse mejorado |
-| **Frontend Build** | ❌ No (manual) | ✅ Vite + HMR |
-| **Tailwind CSS** | ❌ No | ✅ Sí (diseño responsivo) |
+| **Autenticación** | No | Yes - JWT + RBAC |
+| **Usuarios y Roles** | No | Yes - ADMIN, GERENTE, REPARTIDOR, CLIENTE |
+| **Categorías** | Yes - CRUD básico | Yes - CRUD + Jerarquía (parent_id) |
+| **Productos** | Yes - CRUD básico | Yes - CRUD + Relaciones M2M |
+| **Ingredientes** | No | Yes - CRUD + Alergenos |
+| **Pedidos** | No | Yes - CRUD + FSM + Snapshots + Pagos |
+| **Direcciones** | No | Yes - CRUD + Validación |
+| **Admin Panel** | No | Yes - Estadísticas + Gestión global |
+| **Tienda Pública** | No | Yes - HomeStore + Carrito + Checkout |
+| **State Management** | No | Yes - Zustand (Auth + Carrito) |
+| **Custom Hooks** | No | Yes - useCategorias, useProductos, etc. |
+| **ProtectedRoute** | No | Yes - Validación Auth + Rol |
+| **Frontend Routing** | Básico | Yes - React Router v6 con guards |
+| **API Versionamiento** | `/categorias` | Yes - `/api/v1/categorias` |
+| **Unit of Work** | No | Yes - Context manager |
+| **Repository Pattern** | No | Yes - BaseRepository genérico |
+| **Soft Deletes** | Yes | Yes (mejorado) |
+| **Response Envelope** | Yes - Básico | Yes - StandardResponse mejorado |
+| **Frontend Build** | No (manual) | Yes - Vite + HMR |
+| **Tailwind CSS** | No | Yes (diseño responsivo) |
 
 ---
 
@@ -558,32 +558,32 @@ Incluye ejemplos de:
 ## Comparativa: Requisitos Entregables
 
 ### TP Integrador (P4_P1)
-- ✅ Categorías CRUD
-- ✅ Productos CRUD
-- ✅ Relación Producto↔Categoría (M2M)
-- ✅ SQLModel + SQLAlchemy
-- ✅ FastAPI con documentación automática
-- ✅ Paginación en listados
-- ✅ Validación con Pydantic
+- Categorías CRUD
+- Productos CRUD
+- Relación Producto-Categoría (M2M)
+- SQLModel + SQLAlchemy
+- FastAPI con documentación automática
+- Paginación en listados
+- Validación con Pydantic
 
 ### Parcial 2 (P4_P2) - Todos los de P4_P1 PLUS:
-- ✅ **Autenticación JWT**
-- ✅ **RBAC con roles**
-- ✅ **Módulo Usuarios**
-- ✅ **Módulo Ingredientes**
-- ✅ **Módulo Pedidos con FSM**
-- ✅ **Módulo Direcciones**
-- ✅ **Pedidos con Detalles + Snapshots**
-- ✅ **Sistema de Pagos (estructura)**
-- ✅ **Panel Administrativo**
-- ✅ **Tienda Pública (HomeStore + Carrito + Checkout)**
-- ✅ **MisPedidos (historial de usuario)**
-- ✅ **Frontend React + TypeScript + Vite**
-- ✅ **State Management (Zustand)**
-- ✅ **Routing protegido (ProtectedRoute)**
-- ✅ **Unit of Work Pattern**
-- ✅ **Repository Pattern**
-- ✅ **API Versionamiento (/api/v1/)**
-- ✅ **Tailwind CSS**
-- ✅ **Refactoring de routers** (limpieza de código)
+- **Autenticación JWT**
+- **RBAC con roles**
+- **Módulo Usuarios**
+- **Módulo Ingredientes**
+- **Módulo Pedidos con FSM**
+- **Módulo Direcciones**
+- **Pedidos con Detalles + Snapshots**
+- **Sistema de Pagos (estructura)**
+- **Panel Administrativo**
+- **Tienda Pública (HomeStore + Carrito + Checkout)**
+- **MisPedidos (historial de usuario)**
+- **Frontend React + TypeScript + Vite**
+- **State Management (Zustand)**
+- **Routing protegido (ProtectedRoute)**
+- **Unit of Work Pattern**
+- **Repository Pattern**
+- **API Versionamiento (/api/v1/)**
+- **Tailwind CSS**
+- **Refactoring de routers** (limpieza de código)
 
