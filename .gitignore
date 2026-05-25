@@ -27,6 +27,9 @@ ENV/
 env/
 pip-log.txt
 pip-delete-this-directory.txt
+backend/.venv/
+backend/venv/
+backend/.pytest_cache/
 
 # IDE
 .vscode/
@@ -43,7 +46,6 @@ node_modules/
 npm-debug.log
 yarn-error.log
 .npm
-package-lock.json
 
 # Frontend build
 frontend/dist/
@@ -61,11 +63,10 @@ frontend/build/
 .env.*.local
 
 # Testing
-tests/
-requirements-dev.txt
 .pytest_cache/
 .coverage
 htmlcov/
+backend/test.db
 
 # OS
 .DS_Store
