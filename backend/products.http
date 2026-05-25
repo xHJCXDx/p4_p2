@@ -1,0 +1,50 @@
+### Categorías
+GET http://localhost:8000/categorias
+Content-Type: application/json
+
+### Crear Categoría 1
+POST http://localhost:8000/categorias
+Content-Type: application/json
+
+{
+  "nombre": "Electrónica",
+  "descripcion": "Dispositivos electrónicos"
+}
+
+### Crear Categoría 2
+POST http://localhost:8000/categorias
+Content-Type: application/json
+
+{
+  "nombre": "Hogar",
+  "descripcion": "Artículos para el hogar"
+}
+
+### Productos
+GET http://localhost:8000/productos
+Content-Type: application/json
+
+### Crear Producto con Categorías
+POST http://localhost:8000/productos
+Content-Type: application/json
+
+{
+  "nombre": "Smartphone",
+  "descripcion": "Celular de alta gama",
+  "precio_base": 120000.0,
+  "disponible": true,
+  "categoria_ids": [1, 2]
+}
+
+### Actualizar Producto
+PUT http://localhost:8000/productos/1
+Content-Type: application/json
+
+{
+  "nombre": "Smartphone Pro",
+  "precio_base": 150000.0,
+  "categoria_ids": [1]
+}
+
+### Eliminar Producto
+DELETE http://localhost:8000/productos/1
