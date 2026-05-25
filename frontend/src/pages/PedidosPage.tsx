@@ -167,13 +167,8 @@ function PedidosPage() {
                   <td className="border border-gray-300 p-3">{pedido.id}</td>
                   <td className="border border-gray-300 p-3">Usuario {pedido.usuario_id}</td>
                   <td className="border border-gray-300 p-3">
-<<<<<<< HEAD
                     <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getEstadoBadgeColor(pedido.estado_codigo || '')}`}>
                       {pedido.estado_codigo || 'N/A'}
-=======
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getEstadoBadgeColor(pedido.estado_codigo)}`}>
-                      {pedido.estado_codigo}
->>>>>>> origin/main
                     </span>
                   </td>
                   <td className="border border-gray-300 p-3 text-right font-bold">${pedido.total?.toFixed(2)}</td>

@@ -31,7 +31,6 @@ export function PedidoFormSimple({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-<<<<<<< HEAD
     if (!formData.usuario_id || formData.usuario_id < 1) {
       newErrors.usuario_id = 'Usuario requerido';
     }
@@ -39,15 +38,6 @@ export function PedidoFormSimple({
       newErrors.subtotal = 'Subtotal debe ser mayor a 0';
     }
     if (!formData.total || formData.total < 0.01) {
-=======
-    if (formData.usuario_id < 1) {
-      newErrors.usuario_id = 'Usuario requerido';
-    }
-    if (formData.subtotal < 0.01) {
-      newErrors.subtotal = 'Subtotal debe ser mayor a 0';
-    }
-    if (formData.total < 0.01) {
->>>>>>> origin/main
       newErrors.total = 'Total debe ser mayor a 0';
     }
 

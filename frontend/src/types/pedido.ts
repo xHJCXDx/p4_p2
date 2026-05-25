@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 export interface LineaVenta {
   producto_id: number;
   cantidad: number;
@@ -22,39 +21,16 @@ export interface Pedido {
   costo_envio?: number;
   total?: number;
   notas?: string;
-=======
-export interface Pedido {
-  id?: number;
-  usuario_id: number;
-  direccion_id?: number;
-  estado_codigo: string;
-  forma_pago_codigo: string;
-  subtotal: number;
-  descuento: number;
-  costo_envio: number;
-  total: number;
-  notas?: string;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
->>>>>>> origin/main
 }
 
 export interface DetallePedido {
   pedido_id: number;
   producto_id: number;
   cantidad: number;
-<<<<<<< HEAD
   personalizacion?: number[];
   nombre_snapshot?: string;
   precio_snapshot?: number;
   subtotal_snap?: number;
-=======
-  personalizacion: number[];
-  nombre_snapshot: string;
-  precio_snapshot: number;
-  subtotal_snap: number;
->>>>>>> origin/main
   created_at?: string;
 }
 

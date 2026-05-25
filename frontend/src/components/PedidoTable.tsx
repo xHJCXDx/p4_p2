@@ -51,13 +51,8 @@ export function PedidoTable({ data, onEdit, onDelete, isLoading = false }: Pedid
       columnHelper.accessor('estado_codigo', {
         header: 'Estado',
         cell: (info) => (
-<<<<<<< HEAD
           <span className={`px-2 py-1 rounded-full text-sm font-semibold ${getEstadoBadgeColor(info.getValue() || '')}`}>
             {info.getValue() || 'N/A'}
-=======
-          <span className={`px-2 py-1 rounded-full text-sm font-semibold ${getEstadoBadgeColor(info.getValue())}`}>
-            {info.getValue()}
->>>>>>> origin/main
           </span>
         ),
         enableSorting: true,

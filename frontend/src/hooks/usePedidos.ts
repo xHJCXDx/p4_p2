@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-<<<<<<< HEAD
 import apiClient from '../api/axios';
 import { Pedido } from '../types/pedido';
 
@@ -11,55 +10,20 @@ const fetchPedidos = async (limit = 100, offset = 0): Promise<Pedido[]> => {
     params: { limit, offset },
   });
   return response.data;
-=======
-import { Pedido } from '../types/pedido';
-
-const API_URL = 'http://localhost:8000/pedidos';
-
-// Fetch all pedidos
-const fetchPedidos = async (limit = 100, offset = 0): Promise<Pedido[]> => {
-  const response = await fetch(`${API_URL}/?limit=${limit}&offset=${offset}`);
-  const result = await response.json();
-
-  if (result.success && result.data) {
-    const items = result.data.items || result.data;
-    return Array.isArray(items) ? items : [];
-  }
-  return result;
->>>>>>> origin/main
 };
 
 // Fetch single pedido
 const fetchPedido = async (id: number): Promise<Pedido> => {
-<<<<<<< HEAD
   const response = await apiClient.get<Pedido>(`${API_URL}/${id}`);
   return response.data;
-=======
-  const response = await fetch(`${API_URL}/${id}`);
-  const result = await response.json();
-  if (result.success && result.data) return result.data;
-  return result;
->>>>>>> origin/main
 };
 
 // Create pedido
 const createPedido = async (
   data: Omit<Pedido, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>
 ): Promise<Pedido> => {
-<<<<<<< HEAD
   const response = await apiClient.post<Pedido>(API_URL, data);
   return response.data;
-=======
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) throw new Error('Error creating pedido');
-  const result = await response.json();
-  return result.data || result;
->>>>>>> origin/main
 };
 
 // Update pedido
@@ -67,25 +31,12 @@ const updatePedido = async (
   id: number,
   data: Omit<Pedido, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>
 ): Promise<Pedido> => {
-<<<<<<< HEAD
   const response = await apiClient.put<Pedido>(`${API_URL}/${id}`, data);
   return response.data;
-=======
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) throw new Error('Error updating pedido');
-  const result = await response.json();
-  return result.data || result;
->>>>>>> origin/main
 };
 
 // Delete pedido
 const deletePedido = async (id: number): Promise<void> => {
-<<<<<<< HEAD
   await apiClient.delete(`${API_URL}/${id}`);
 };
 
@@ -100,13 +51,6 @@ const transitionEstado = async (
     { params: { accion } }
   );
   return response.data;
-=======
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: 'DELETE',
-  });
-
-  if (!response.ok) throw new Error('Error deleting pedido');
->>>>>>> origin/main
 };
 
 // Hooks
@@ -164,7 +108,6 @@ export const useDeletePedido = () => {
     },
   });
 };
-<<<<<<< HEAD
 
 export const useTransitionEstado = () => {
   const queryClient = useQueryClient();
@@ -177,5 +120,3 @@ export const useTransitionEstado = () => {
     },
   });
 };
-=======
->>>>>>> origin/main
