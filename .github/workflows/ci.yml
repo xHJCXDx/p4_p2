@@ -72,16 +72,30 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
+      - name: Verify dependencies
+        run: |
+          cd frontend
+          echo "Node version:"
+          node --version
+          echo "npm version:"
+          npm --version
+          echo "Checking critical packages:"
+          npm list react react-dom react-router-dom typescript
+          echo "Checking node_modules:"
+          ls -la node_modules/.bin/ | head -10
+
       - name: TypeScript type check
         run: |
           cd frontend
-          npx tsc --noEmit
+          echo "Running tsc..."
+          npx tsc --noEmit --pretty false --listFiles false 2>&1 | head -50
         continue-on-error: true
 
       - name: Build frontend
         run: |
           cd frontend
-          npm run build
+          echo "Running build..."
+          npm run build 2>&1
         continue-on-error: true
 
   validation:
