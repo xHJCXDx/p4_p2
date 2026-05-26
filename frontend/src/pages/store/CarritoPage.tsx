@@ -2,7 +2,9 @@ import { Link } from 'react-router-dom';
 import { useCarritoStore } from '../../store/useCarritoStore';
 
 export default function CarritoPage() {
-  const { items, total, removeItem, updateCantidad } = useCarritoStore();
+  const { items: rawItems, total, removeItem, updateCantidad } = useCarritoStore();
+  // Filtrar items con datos inválidos (ej: precio undefined por localStorage viejo)
+  const items = rawItems.filter((item) => item.precio != null && item.nombre != null);
 
   if (items.length === 0) {
     return (

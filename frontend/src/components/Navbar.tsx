@@ -18,7 +18,7 @@ const Navbar = () => {
     <nav className="bg-blue-600 p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="text-white text-2xl font-bold hover:text-gray-100 transition-colors">
-          TP Programación IV
+          Delivery de Alimentos
         </Link>
 
         <div className="flex gap-6 items-center">
