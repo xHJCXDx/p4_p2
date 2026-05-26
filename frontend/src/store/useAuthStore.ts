@@ -4,8 +4,10 @@ import { persist } from 'zustand/middleware';
 export interface Usuario {
   id: number;
   nombre: string;
+  apellido: string;
   email: string;
-  roles: string[];
+  celular: string | null;
+  roles: { codigo: string; nombre: string; descripcion: string }[];
   created_at: string;
 }
 
@@ -39,7 +41,7 @@ export const useAuthStore = create<AuthState>()(
 
       hasRole: (role: string) => {
         const state = get();
-        return state.usuario?.roles.includes(role) ?? false;
+        return state.usuario?.roles.some((r) => r.codigo === role) ?? false;
       },
     }),
     {

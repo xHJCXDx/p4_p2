@@ -10,8 +10,10 @@ def usuario_to_read(usuario: Usuario) -> UsuarioRead:
     return UsuarioRead(
         id=usuario.id,
         nombre=usuario.nombre,
+        apellido=usuario.apellido,
         email=usuario.email,
-        roles=[{"codigo": r.codigo, "descripcion": r.descripcion} for r in usuario.roles],
+        celular=usuario.celular,
+        roles=[{"codigo": r.codigo, "nombre": r.nombre, "descripcion": r.descripcion} for r in usuario.roles],
         created_at=usuario.created_at.isoformat()
     )
 
@@ -37,7 +39,9 @@ def register_user(session: Session, user_data: UsuarioCreate) -> Usuario:
         # Crear usuario
         new_user = Usuario(
             nombre=user_data.nombre,
+            apellido=user_data.apellido,
             email=user_data.email,
+            celular=user_data.celular,
             password_hash=hash_password(user_data.password)
         )
 
@@ -84,8 +88,12 @@ def update_user(session: Session, user: Usuario, update_data: UsuarioUpdate) -> 
         # Actualizar campos
         if update_data.nombre:
             user.nombre = update_data.nombre
+        if update_data.apellido is not None:
+            user.apellido = update_data.apellido
         if update_data.email:
             user.email = update_data.email
+        if update_data.celular is not None:
+            user.celular = update_data.celular
 
         session.add(user)
     return user

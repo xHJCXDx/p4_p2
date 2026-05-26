@@ -28,10 +28,13 @@ def create_direccion(session: Session, usuario_id: int, data: DireccionCreate) -
         nueva_direccion = DireccionEntrega(
             usuario_id=usuario_id,
             alias=data.alias,
-            calle=data.calle,
+            linea1=data.linea1,
+            linea2=data.linea2,
             ciudad=data.ciudad,
             provincia=data.provincia,
             codigo_postal=data.codigo_postal,
+            latitud=data.latitud,
+            longitud=data.longitud,
             es_principal=data.es_principal
         )
 
@@ -57,14 +60,20 @@ def update_direccion(session: Session, direccion: DireccionEntrega, data: Direcc
         # Actualizar campos
         if data.alias:
             direccion.alias = data.alias
-        if data.calle:
-            direccion.calle = data.calle
+        if data.linea1:
+            direccion.linea1 = data.linea1
+        if data.linea2 is not None:
+            direccion.linea2 = data.linea2
         if data.ciudad:
             direccion.ciudad = data.ciudad
         if data.provincia:
             direccion.provincia = data.provincia
         if data.codigo_postal:
             direccion.codigo_postal = data.codigo_postal
+        if data.latitud is not None:
+            direccion.latitud = data.latitud
+        if data.longitud is not None:
+            direccion.longitud = data.longitud
         if data.es_principal is not None:
             direccion.es_principal = data.es_principal
 

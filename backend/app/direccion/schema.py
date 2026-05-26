@@ -6,10 +6,13 @@ from pydantic import BaseModel
 
 class DireccionCreate(BaseModel):
     alias: str
-    calle: str
+    linea1: str
+    linea2: Optional[str] = None
     ciudad: str
     provincia: str
     codigo_postal: str
+    latitud: Optional[float] = None
+    longitud: Optional[float] = None
     es_principal: Optional[bool] = False
 
 
@@ -17,17 +20,23 @@ class DireccionRead(BaseModel):
     id: int
     usuario_id: int
     alias: str
-    calle: str
+    linea1: str
+    linea2: Optional[str] = None
     ciudad: str
     provincia: str
     codigo_postal: str
+    latitud: Optional[float] = None
+    longitud: Optional[float] = None
     es_principal: bool
     created_at: str
 
 
 class DireccionUpdate(BaseModel):
     alias: Optional[str] = None
-    calle: Optional[str] = None
+    linea1: Optional[str] = None
+    linea2: Optional[str] = None
     ciudad: Optional[str] = None
     provincia: Optional[str] = None
     codigo_postal: Optional[str] = None
+    latitud: Optional[float] = None
+    longitud: Optional[float] = None

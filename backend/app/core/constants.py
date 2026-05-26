@@ -38,8 +38,8 @@ ACCIONES_A_ESTADOS = {
 
 # Roles (Seed obligatorio)
 ROLES = [
-    {"codigo": "ADMIN", "descripcion": "Administrador del sistema"},
-    {"codigo": "STOCK", "descripcion": "Gestor de Stock"},
-    {"codigo": "PEDIDOS", "descripcion": "Gestor de Pedidos"},
-    {"codigo": "CLIENT", "descripcion": "Cliente"},
+    {"codigo": "ADMIN", "nombre": "Administrador", "descripcion": "Administrador del sistema"},
+    {"codigo": "STOCK", "nombre": "Gestor de Stock", "descripcion": "Gestor de Stock"},
+    {"codigo": "PEDIDOS", "nombre": "Gestor de Pedidos", "descripcion": "Gestor de Pedidos"},
+    {"codigo": "CLIENT", "nombre": "Cliente", "descripcion": "Cliente"},
 ]

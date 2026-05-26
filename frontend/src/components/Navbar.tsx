@@ -29,7 +29,7 @@ const Navbar = () => {
                 Hola, <span className="font-semibold">{usuario.nombre}</span>
               </span>
 
-              {usuario.roles.includes('ADMIN') || usuario.roles.includes('PEDIDOS') ? (
+              {usuario.roles.some((r) => r.codigo === 'ADMIN') || usuario.roles.some((r) => r.codigo === 'PEDIDOS') ? (
                 <>
                   <Link
                     to="/admin/categorias"

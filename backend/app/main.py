@@ -22,7 +22,7 @@ def seed_roles(session: Session):
     for role_data in ROLES:
         existing = session.exec(select(Rol).where(Rol.codigo == role_data["codigo"])).first()
         if not existing:
-            new_role = Rol(codigo=role_data["codigo"], descripcion=role_data["descripcion"])
+            new_role = Rol(codigo=role_data["codigo"], nombre=role_data["nombre"], descripcion=role_data["descripcion"])
             session.add(new_role)
     session.commit()
 
@@ -32,10 +32,10 @@ def seed_users(session: Session):
     from app.usuario.model import UsuarioRolLink
 
     users_data = [
-        {"nombre": "Admin", "email": "admin@admin.com", "password": "admin123", "rol": "ADMIN"},
-        {"nombre": "Cliente Demo", "email": "cliente@test.com", "password": "cliente123", "rol": "CLIENT"},
-        {"nombre": "Empleado Pedidos", "email": "empleado@cafe.com", "password": "empleado123", "rol": "PEDIDOS"},
-        {"nombre": "Gerente Stock", "email": "gerente@cafe.com", "password": "gerente123", "rol": "STOCK"},
+        {"nombre": "Admin", "apellido": "Sistema", "email": "admin@admin.com", "password": "admin123", "rol": "ADMIN"},
+        {"nombre": "Cliente", "apellido": "Demo", "email": "cliente@test.com", "password": "cliente123", "rol": "CLIENT"},
+        {"nombre": "Empleado", "apellido": "Pedidos", "email": "empleado@cafe.com", "password": "empleado123", "rol": "PEDIDOS"},
+        {"nombre": "Gerente", "apellido": "Stock", "email": "gerente@cafe.com", "password": "gerente123", "rol": "STOCK"},
     ]
 
     for user_data in users_data:
@@ -43,6 +43,7 @@ def seed_users(session: Session):
         if not existing:
             user = Usuario(
                 nombre=user_data["nombre"],
+                apellido=user_data["apellido"],
                 email=user_data["email"],
                 password_hash=hash_password(user_data["password"])
             )

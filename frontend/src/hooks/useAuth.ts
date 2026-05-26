@@ -26,10 +26,6 @@ export function useLogin() {
       }
 
       const userData = result.data;
-      // Normalizar roles: backend envía [{codigo, descripcion}], frontend espera string[]
-      if (userData.roles && userData.roles.length > 0 && typeof userData.roles[0] === 'object') {
-        userData.roles = userData.roles.map((r: any) => r.codigo);
-      }
       setUsuario(userData);
       return userData;
     },

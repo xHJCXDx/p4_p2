@@ -104,7 +104,7 @@ export default function CheckoutPage() {
                         {dir.alias}
                         {dir.es_principal && <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Principal</span>}
                       </p>
-                      <p className="text-sm text-gray-600">{dir.calle}</p>
+                      <p className="text-sm text-gray-600">{dir.linea1}{dir.linea2 ? `, ${dir.linea2}` : ''}</p>
                       <p className="text-sm text-gray-600">{dir.ciudad}, {dir.provincia} {dir.codigo_postal}</p>
                     </div>
                   </label>
