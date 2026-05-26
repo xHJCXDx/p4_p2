@@ -27,27 +27,34 @@ def seed_roles(session: Session):
     session.commit()
 
 
-def seed_admin_user(session: Session):
-    """Seed de usuario admin por defecto."""
-    admin_email = "admin@admin.com"
-    existing_admin = session.exec(select(Usuario).where(Usuario.email == admin_email)).first()
-    if not existing_admin:
-        admin_user = Usuario(
-            nombre="Admin",
-            email=admin_email,
-            password_hash=hash_password("admin123")
-        )
-        session.add(admin_user)
-        session.flush()
+def seed_users(session: Session):
+    """Seed de usuarios por defecto para cada rol."""
+    from app.usuario.model import UsuarioRolLink
 
-        # Asignar rol ADMIN
-        admin_role = session.exec(select(Rol).where(Rol.codigo == "ADMIN")).first()
-        if admin_role:
-            from app.usuario.model import UsuarioRolLink
-            usuario_rol = UsuarioRolLink(usuario_id=admin_user.id, rol_codigo=admin_role.codigo)
-            session.add(usuario_rol)
+    users_data = [
+        {"nombre": "Admin", "email": "admin@admin.com", "password": "admin123", "rol": "ADMIN"},
+        {"nombre": "Cliente Demo", "email": "cliente@test.com", "password": "cliente123", "rol": "CLIENT"},
+        {"nombre": "Empleado Pedidos", "email": "empleado@cafe.com", "password": "empleado123", "rol": "PEDIDOS"},
+        {"nombre": "Gerente Stock", "email": "gerente@cafe.com", "password": "gerente123", "rol": "STOCK"},
+    ]
 
-        session.commit()
+    for user_data in users_data:
+        existing = session.exec(select(Usuario).where(Usuario.email == user_data["email"])).first()
+        if not existing:
+            user = Usuario(
+                nombre=user_data["nombre"],
+                email=user_data["email"],
+                password_hash=hash_password(user_data["password"])
+            )
+            session.add(user)
+            session.flush()
+
+            role = session.exec(select(Rol).where(Rol.codigo == user_data["rol"])).first()
+            if role:
+                usuario_rol = UsuarioRolLink(usuario_id=user.id, rol_codigo=role.codigo)
+                session.add(usuario_rol)
+
+    session.commit()
 
 
 @asynccontextmanager
@@ -56,7 +63,7 @@ async def lifespan(app: FastAPI):
     with Session(engine) as session:
         seed_roles(session)
         seed_catalogos(session)
-        seed_admin_user(session)
+        seed_users(session)
         seed_data_completo(session)
     yield
 
