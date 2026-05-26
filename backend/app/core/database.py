@@ -1,10 +1,10 @@
 import os
 from sqlmodel import SQLModel, create_engine, Session
 
-# SQLite Configuration
+# PostgreSQL Configuration
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "sqlite:///database.db"
+    "postgresql://postgres:postgres@localhost:5432/p4_p2_db"
 )
 
 # JWT Configuration
@@ -17,6 +17,7 @@ engine = create_engine(
     echo=False,
     pool_size=10,
     max_overflow=20,
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 )
 
 def create_db_and_tables():
