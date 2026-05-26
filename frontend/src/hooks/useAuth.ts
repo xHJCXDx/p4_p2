@@ -20,13 +20,25 @@ export function useLogin() {
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
       const response = await apiClient.post('/auth/login', credentials);
-      return response.data.data || response.data;
+      const result = response.data;
+
+      // El backend devuelve HTTP 200 incluso en errores, verificar success
+      if (!result.success) {
+        throw new Error(result.message || 'Credenciales inválidas');
+      }
+
+      return result.data || result;
     },
     onSuccess: () => {
       // Obtener datos del usuario después del login
       return apiClient.get('/auth/me').then((res) => {
-        setUsuario(res.data.data || res.data);
-        return res.data;
+        const userData = res.data.data || res.data;
+        // Normalizar roles: backend envía [{codigo, descripcion}], frontend espera string[]
+        if (userData.roles && userData.roles.length > 0 && typeof userData.roles[0] === 'object') {
+          userData.roles = userData.roles.map((r: any) => r.codigo);
+        }
+        setUsuario(userData);
+        return userData;
       });
     },
   });

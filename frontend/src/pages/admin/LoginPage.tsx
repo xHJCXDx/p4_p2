@@ -25,7 +25,7 @@ export default function LoginPage() {
           navigate('/admin');
         },
         onError: (err: any) => {
-          setError(err.response?.data?.detail || 'Credenciales inválidas');
+          setError(err.response?.data?.message || err.message || 'Credenciales inválidas');
         },
       }
     );
