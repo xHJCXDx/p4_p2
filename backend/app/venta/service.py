@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 from datetime import datetime
 from sqlmodel import Session
 from app.venta.model import Pedido, DetallePedido, Pago, HistorialEstadoPedido
-from app.venta.schema import PedidoCreate, PedidoUpdate, DetallePedidoCreate, PagoCreate
+from app.venta.schema import PedidoCreate, PedidoCreateFromCheckout, PedidoUpdate, DetallePedidoCreate, PagoCreate
 from app.venta.unit_of_work import VentaUnitOfWork
 from app.core.constants import TRANSICIONES_PERMITIDAS
 from app.producto.model import Producto
@@ -43,6 +43,81 @@ def create_pedido(session: Session, pedido_data: PedidoCreate) -> Pedido:
             motivo=None
         )
         uow.historial.create(historial)
+    session.refresh(pedido)
+    return pedido
+
+
+def create_pedido_from_checkout(session: Session, checkout_data: PedidoCreateFromCheckout, usuario_id: int) -> Pedido:
+    """
+    Crea pedido completo desde el checkout del cliente.
+    Valida stock, calcula totales, crea detalles con snapshot, y descuenta stock.
+    """
+    if not checkout_data.linea_ventas:
+        raise ValueError("El pedido debe tener al menos un producto")
+
+    # Validar stock y calcular subtotal
+    subtotal = 0.0
+    productos_info = []
+    for linea in checkout_data.linea_ventas:
+        producto = session.get(Producto, linea.producto_id)
+        if not producto or producto.deleted_at is not None:
+            raise ValueError(f"Producto {linea.producto_id} no existe o fue eliminado")
+        if not producto.disponible:
+            raise ValueError(f"Producto '{producto.nombre}' no está disponible")
+        if producto.stock_cantidad < linea.cantidad:
+            raise ValueError(
+                f"Stock insuficiente para '{producto.nombre}': "
+                f"disponible {producto.stock_cantidad}, solicitado {linea.cantidad}"
+            )
+        linea_subtotal = producto.precio_base * linea.cantidad
+        subtotal += linea_subtotal
+        productos_info.append((producto, linea.cantidad, linea_subtotal))
+
+    costo_envio = 50.0
+    total = subtotal + costo_envio
+
+    with VentaUnitOfWork(session) as uow:
+        pedido = Pedido(
+            usuario_id=usuario_id,
+            direccion_id=checkout_data.direccion_id,
+            estado_codigo="PENDIENTE",
+            forma_pago_codigo=checkout_data.forma_pago_codigo,
+            notas=checkout_data.notas,
+            subtotal=subtotal,
+            descuento=0.0,
+            costo_envio=costo_envio,
+            total=total,
+        )
+        pedido = uow.pedidos.create(pedido)
+        uow.pedidos.flush()
+
+        # Crear detalles con snapshot y descontar stock
+        for producto, cantidad, linea_subtotal in productos_info:
+            detalle = DetallePedido(
+                pedido_id=pedido.id,
+                producto_id=producto.id,
+                cantidad=cantidad,
+                nombre_snapshot=producto.nombre,
+                precio_snapshot=producto.precio_base,
+                subtotal_snap=linea_subtotal,
+            )
+            uow.detalles.create(detalle)
+
+            # Descontar stock
+            producto.stock_cantidad -= cantidad
+            if producto.stock_cantidad == 0:
+                producto.disponible = False
+            session.add(producto)
+
+        # Historial inicial
+        historial = HistorialEstadoPedido(
+            pedido_id=pedido.id,
+            estado_desde=None,
+            estado_hacia="PENDIENTE",
+            usuario_id=usuario_id,
+        )
+        uow.historial.create(historial)
+
     session.refresh(pedido)
     return pedido
 

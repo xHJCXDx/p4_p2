@@ -11,7 +11,7 @@ export function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
 
   // Si no está autenticado, redirigir a login
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // Si se requieren roles específicos, validar

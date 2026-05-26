@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useCategorias } from '../../hooks/useCategorias';
 import { useProductos } from '../../hooks/useProductos';
 import { useCarritoStore } from '../../store/useCarritoStore';
@@ -80,18 +81,59 @@ export default function HomeStorePage() {
                 <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-48 object-cover" />
               )}
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{producto.nombre}</h3>
-                {producto.descripcion && (
-                  <p className="text-sm text-gray-600 mb-3">{producto.descripcion}</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{producto.nombre}</h3>
+
+                {producto.categorias?.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {producto.categorias.map((cat: any) => (
+                      <span key={cat.id} className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                        {cat.nombre}
+                      </span>
+                    ))}
+                  </div>
                 )}
+
+                {producto.descripcion && (
+                  <p className="text-sm text-gray-600 mb-2">{producto.descripcion}</p>
+                )}
+
+                {producto.ingredientes?.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs text-gray-500 font-semibold mb-1">Ingredientes:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {producto.ingredientes.map((ing: any) => (
+                        <span
+                          key={ing.id}
+                          className={`text-xs px-2 py-0.5 rounded-full ${
+                            ing.es_alergeno
+                              ? 'bg-red-100 text-red-700 font-semibold'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {ing.nombre}
+                          {ing.es_alergeno && ' ⚠'}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center">
                   <span className="text-2xl font-bold text-blue-600">${producto.precio_base}</span>
-                  <button
-                    onClick={() => handleAddToCarrito(producto)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Agregar
-                  </button>
+                  <div className="flex gap-2">
+                    <Link
+                      to={`/store/producto/${producto.id}`}
+                      className="text-blue-600 border border-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors text-sm"
+                    >
+                      Ver detalle
+                    </Link>
+                    <button
+                      onClick={() => handleAddToCarrito(producto)}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Agregar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

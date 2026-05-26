@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, status, Query
 from sqlmodel import Session, select
+from sqlalchemy.orm import selectinload
 from app.core.database import get_session
 from app.core.response import success_response, error_response, ApiResponse
 from app.core.security import require_roles
@@ -13,14 +14,17 @@ router = APIRouter(prefix="/api/v1/productos", tags=["Productos"])
 @router.get("/")
 def read_productos(
     session: Session = Depends(get_session),
-    limit: int = Query(10, ge=1, le=100),
-    offset: int = Query(0, ge=0),
-    categoria_id: Optional[int] = Query(None, description="Filtrar por categoría"),
-    disponible: Optional[bool] = Query(None, description="Filtrar por disponibilidad"),
-    busqueda: Optional[str] = Query(None, description="Buscar por nombre")
+    limit: Annotated[int, Query(ge=1, le=100, description="Cantidad de productos por página")] = 10,
+    offset: Annotated[int, Query(ge=0, description="Desplazamiento para paginación")] = 0,
+    categoria_id: Annotated[Optional[int], Query(description="Filtrar por categoría")] = None,
+    disponible: Annotated[Optional[bool], Query(description="Filtrar por disponibilidad")] = None,
+    busqueda: Annotated[Optional[str], Query(description="Buscar por nombre")] = None,
 ) -> ApiResponse:
     """Listado público de productos con filtros: categoría, disponibilidad, búsqueda."""
-    statement = select(Producto)
+    statement = select(Producto).where(Producto.deleted_at.is_(None)).options(
+        selectinload(Producto.categorias),
+        selectinload(Producto.ingredientes),
+    )
 
     if disponible is not None:
         statement = statement.where(Producto.disponible == disponible)
@@ -34,7 +38,7 @@ def read_productos(
             ProductoCategoriaLink.categoria_id == categoria_id
         )
 
-    count_statement = select(Producto)
+    count_statement = select(Producto).where(Producto.deleted_at.is_(None))
     if disponible is not None:
         count_statement = count_statement.where(Producto.disponible == disponible)
     if busqueda:
@@ -47,7 +51,7 @@ def read_productos(
     total = len(session.exec(count_statement).all())
 
     statement = statement.offset(offset).limit(limit)
-    productos = session.exec(statement).all()
+    productos = session.exec(statement).unique().all()
 
     return success_response(
         data={
@@ -57,6 +61,22 @@ def read_productos(
             "offset": offset
         },
         message="Productos obtenidos exitosamente"
+    )
+
+@router.get("/{producto_id}")
+def read_producto(producto_id: int, session: Session = Depends(get_session)) -> ApiResponse:
+    """Detalle público de un producto por ID."""
+    statement = (
+        select(Producto)
+        .where(Producto.id == producto_id, Producto.deleted_at.is_(None))
+        .options(selectinload(Producto.categorias), selectinload(Producto.ingredientes))
+    )
+    producto = session.exec(statement).first()
+    if not producto:
+        return error_response(message="Producto no encontrado", status_code=404)
+    return success_response(
+        data=ProductoRead.model_validate(producto),
+        message="Producto obtenido exitosamente"
     )
 
 @router.post("/", status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_roles("ADMIN"))])

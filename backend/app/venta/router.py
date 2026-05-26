@@ -6,7 +6,7 @@ from app.core.response import success_response, error_response, ApiResponse
 from app.core.security import get_current_user
 from app.core.constants import ACCIONES_A_ESTADOS
 from app.venta.schema import (
-    PedidoCreate, PedidoRead, PedidoUpdate,
+    PedidoCreate, PedidoCreateFromCheckout, PedidoRead, PedidoUpdate,
     DetallePedidoCreate, DetallePedidoRead,
     PagoCreate, PagoRead, PagoUpdate,
     HistorialEstadoPedidoRead
@@ -70,18 +70,20 @@ def read_pedido(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_pedido(
-    pedido: PedidoCreate,
+    pedido: PedidoCreateFromCheckout,
     session: Session = Depends(get_session),
     current_user: Usuario = Depends(get_current_user)
 ) -> ApiResponse:
-    """Crea un nuevo pedido."""
+    """Crea un nuevo pedido desde el checkout. Valida stock, calcula totales, crea detalles y descuenta stock."""
     try:
-        new_pedido = service.create_pedido(session, pedido)
+        new_pedido = service.create_pedido_from_checkout(session, pedido, current_user.id)
         return success_response(
             data=PedidoRead.model_validate(new_pedido),
             message="Pedido creado exitosamente",
             status_code=201
         )
+    except ValueError as e:
+        return error_response(message=str(e), status_code=400)
     except Exception as e:
         return error_response(message=f"Error al crear pedido: {str(e)}", status_code=400)
 

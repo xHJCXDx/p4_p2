@@ -1,0 +1,106 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import { ProtectedRoute } from './components/ProtectedRoute';
+
+// Admin pages
+import LoginPage from './pages/admin/LoginPage';
+import CajeroPage from './pages/admin/CajeroPage';
+
+// CRUD pages
+import CategoriasPage from './pages/CategoriasPage';
+import ProductsPage from './pages/ProductsPage';
+import IngredientesPageRefactored from './pages/IngredientesPageRefactored';
+import PedidosPageRefactored from './pages/PedidosPageRefactored';
+
+// Error pages
+const NotFoundPage = () => (
+  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="text-center">
+      <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+      <p className="text-gray-600 mb-4">Pagina no encontrada</p>
+    </div>
+  </div>
+);
+
+const ForbiddenPage = () => (
+  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="text-center">
+      <h1 className="text-4xl font-bold text-gray-900 mb-4">403</h1>
+      <p className="text-gray-600 mb-4">No tienes permiso para acceder a este recurso</p>
+    </div>
+  </div>
+);
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Auth */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Admin routes */}
+      <Route
+        path="/cajero"
+        element={
+          <ProtectedRoute roles={['ADMIN', 'PEDIDOS']}>
+            <CajeroPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* CRUD pages */}
+      <Route
+        path="/categorias"
+        element={
+          <ProtectedRoute roles={['ADMIN']}>
+            <CategoriasPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/productos"
+        element={
+          <ProtectedRoute roles={['ADMIN', 'STOCK']}>
+            <ProductsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ingredientes"
+        element={
+          <ProtectedRoute roles={['ADMIN']}>
+            <IngredientesPageRefactored />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pedidos"
+        element={
+          <ProtectedRoute roles={['ADMIN', 'PEDIDOS']}>
+            <PedidosPageRefactored />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Error pages */}
+      <Route path="/403" element={<ForbiddenPage />} />
+      <Route path="/404" element={<NotFoundPage />} />
+
+      {/* Default redirect */}
+      <Route path="/" element={<Navigate to="/cajero" replace />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <AppRoutes />
+      </div>
+    </Router>
+  );
+}
+
+export default App;

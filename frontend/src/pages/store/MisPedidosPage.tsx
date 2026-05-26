@@ -13,6 +13,25 @@ export default function MisPedidosPage() {
     );
   }
 
+  const getEstadoColor = (estado: string) => {
+    switch (estado) {
+      case 'PENDIENTE':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'CONFIRMADO':
+        return 'bg-blue-100 text-blue-800';
+      case 'EN_PREP':
+        return 'bg-purple-100 text-purple-800';
+      case 'EN_CAMINO':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'ENTREGADO':
+        return 'bg-green-100 text-green-800';
+      case 'CANCELADO':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -30,31 +49,22 @@ export default function MisPedidosPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">Pedido #{pedido.id}</h3>
                     <p className="text-sm text-gray-600">
-                      {new Date(pedido.created_at).toLocaleDateString('es-ES')}
+                      {new Date(pedido.created_at).toLocaleDateString('es-AR')}
                     </p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    pedido.estado_pedido_codigo === 'PENDIENTE'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : pedido.estado_pedido_codigo === 'CONFIRMADO'
-                      ? 'bg-blue-100 text-blue-800'
-                      : pedido.estado_pedido_codigo === 'EN_PREPARACION'
-                      ? 'bg-purple-100 text-purple-800'
-                      : pedido.estado_pedido_codigo === 'EN_CAMINO'
-                      ? 'bg-indigo-100 text-indigo-800'
-                      : 'bg-green-100 text-green-800'
-                  }`}>
-                    {pedido.estado_pedido_codigo}
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getEstadoColor(pedido.estado_codigo)}`}>
+                    {pedido.estado_codigo}
                   </span>
                 </div>
 
-                {pedido.linea_ventas && pedido.linea_ventas.length > 0 && (
+                {pedido.detalles && pedido.detalles.length > 0 && (
                   <div className="mb-4 pb-4 border-b">
                     <p className="text-sm font-medium text-gray-700 mb-2">Productos:</p>
                     <ul className="space-y-1">
-                      {pedido.linea_ventas.map((linea: any, idx: number) => (
-                        <li key={idx} className="text-sm text-gray-600">
-                          • Producto {linea.producto_id} - Cantidad: {linea.cantidad}
+                      {pedido.detalles.map((det: any, idx: number) => (
+                        <li key={idx} className="text-sm text-gray-600 flex justify-between">
+                          <span>{det.nombre_snapshot} x {det.cantidad}</span>
+                          <span className="font-medium">${det.subtotal_snap?.toFixed(2)}</span>
                         </li>
                       ))}
                     </ul>
@@ -64,7 +74,7 @@ export default function MisPedidosPage() {
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-sm text-gray-600">Total:</p>
-                    <p className="text-2xl font-bold text-blue-600">${pedido.monto_total.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-blue-600">${pedido.total?.toFixed(2) ?? '0.00'}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Forma de pago:</p>
