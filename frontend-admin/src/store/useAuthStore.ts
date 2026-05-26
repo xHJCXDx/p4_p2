@@ -45,7 +45,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'auth-storage',
+      name: 'admin-auth-storage',
     }
   )
 );
