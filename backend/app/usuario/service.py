@@ -31,12 +31,10 @@ def register_user(session: Session, user_data: UsuarioCreate) -> Usuario:
     Registra un nuevo usuario y le asigna el rol CLIENT automáticamente.
     """
     with UsuarioUnitOfWork(session) as uow:
-        # Verificar que el email no exista
         existing_user = uow.usuarios.get_by_email(user_data.email)
         if existing_user:
             raise ValueError(f"El email {user_data.email} ya está registrado")
 
-        # Crear usuario
         new_user = Usuario(
             nombre=user_data.nombre,
             apellido=user_data.apellido,
@@ -45,11 +43,9 @@ def register_user(session: Session, user_data: UsuarioCreate) -> Usuario:
             password_hash=hash_password(user_data.password)
         )
 
-        # Agregar usuario a la sesión
         session.add(new_user)
-        session.flush()  # Obtener el ID generado
+        session.flush()
 
-        # Asignar rol CLIENT automáticamente
         rol_client = session.exec(select(Rol).where(Rol.codigo == "CLIENT")).first()
         if rol_client:
             usuario_rol = UsuarioRolLink(usuario_id=new_user.id, rol_codigo=rol_client.codigo)
@@ -79,13 +75,11 @@ def get_user_by_id(session: Session, user_id: int) -> Optional[Usuario]:
 def update_user(session: Session, user: Usuario, update_data: UsuarioUpdate) -> Usuario:
     """Actualiza datos del usuario (nombre, email)."""
     with UsuarioUnitOfWork(session) as uow:
-        # Verificar que el nuevo email no esté en uso
         if update_data.email and update_data.email != user.email:
             existing = uow.usuarios.get_by_email(update_data.email)
             if existing:
                 raise ValueError(f"El email {update_data.email} ya está en uso")
 
-        # Actualizar campos
         if update_data.nombre:
             user.nombre = update_data.nombre
         if update_data.apellido is not None:

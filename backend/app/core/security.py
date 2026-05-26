@@ -9,8 +9,6 @@ from sqlmodel import Session
 
 from app.core.database import get_session, JWT_SECRET_KEY, JWT_ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
-# ============ HASHING ============
-
 def hash_password(plain_password: str) -> str:
     """Hashea una contraseña con bcrypt (cost factor = 12)."""
     salt = bcrypt.gensalt(rounds=12)
@@ -22,8 +20,6 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verifica que una contraseña coincida con su hash."""
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
-
-# ============ JWT ============
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -56,8 +52,6 @@ def verify_token(token: str) -> dict:
         )
 
 
-# ============ DEPENDENCIES ============
-
 
 def get_current_user(request: Request, session: Session = Depends(get_session)):
     """
@@ -66,7 +60,6 @@ def get_current_user(request: Request, session: Session = Depends(get_session)):
     """
     from app.usuario.model import Usuario
 
-    # Obtener token de la cookie
     token = request.cookies.get("access_token")
     if not token:
         raise HTTPException(
@@ -84,7 +77,6 @@ def get_current_user(request: Request, session: Session = Depends(get_session)):
 
     user_id = int(sub)
 
-    # Obtener usuario de la BD
     user = session.get(Usuario, user_id)
     if not user:
         raise HTTPException(

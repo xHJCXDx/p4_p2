@@ -12,7 +12,7 @@ class DireccionEntregaBase(SQLModel):
     linea2: Optional[str] = Field(default=None, max_length=200)
     ciudad: str = Field(max_length=100)
     provincia: str = Field(max_length=100)
-    codigo_postal: str = Field(max_length=20)
+    codigo_postal: str = Field(max_length=10)
     latitud: Optional[float] = None
     longitud: Optional[float] = None
     es_principal: bool = Field(default=False)

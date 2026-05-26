@@ -32,12 +32,10 @@ def update(session: Session, db_producto: Producto, producto_data: ProductoUpdat
     with ProductoUnitOfWork(session) as uow:
         producto_dict = producto_data.model_dump(exclude_unset=True)
 
-        # Extract categoria_ids if present
         categoria_ids = None
         if "categoria_ids" in producto_dict:
             categoria_ids = producto_dict.pop("categoria_ids")
 
-        # Actualizar timestamp
         producto_dict["updated_at"] = datetime.utcnow()
 
         updated = uow.productos.update(db_producto, producto_dict, categoria_ids)

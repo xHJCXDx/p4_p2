@@ -18,14 +18,18 @@ from app.venta import service
 router = APIRouter(prefix="/api/v1/pedidos", tags=["Pedidos"])
 
 
+def _role_codes(user: Usuario) -> list[str]:
+    return [role.codigo for role in user.roles]
+
+
 def is_client_only(user: Usuario) -> bool:
-    user_roles = [role.codigo for role in user.roles]
-    return "CLIENT" in user_roles and "ADMIN" not in user_roles and "PEDIDOS" not in user_roles
+    codes = _role_codes(user)
+    return "CLIENT" in codes and "ADMIN" not in codes and "PEDIDOS" not in codes
 
 
 def is_admin_or_pedidos(user: Usuario) -> bool:
-    user_roles = [role.codigo for role in user.roles]
-    return "ADMIN" in user_roles or "PEDIDOS" in user_roles
+    codes = _role_codes(user)
+    return "ADMIN" in codes or "PEDIDOS" in codes
 
 @router.get("/")
 def read_pedidos(
@@ -93,7 +97,6 @@ def update_pedido(
     if not db_pedido:
         return error_response(message="Pedido no encontrado", status_code=404)
 
-    # Verificar permisos: solo ADMIN/PEDIDOS pueden actualizar
     if not is_admin_or_pedidos(current_user):
         return error_response(message="No tienes permiso para actualizar pedidos", status_code=403)
 
@@ -114,14 +117,11 @@ def delete_pedido(
     if not db_pedido:
         return error_response(message="Pedido no encontrado", status_code=404)
 
-    # Verificar permisos: solo ADMIN/PEDIDOS pueden eliminar
     if not is_admin_or_pedidos(current_user):
         return error_response(message="No tienes permiso para eliminar pedidos", status_code=403)
 
     service.delete_pedido(session, db_pedido)
     return success_response(message="Pedido eliminado exitosamente")
-
-# ============ TRANSICIÓN DE ESTADO (FSM) ============
 
 @router.post("/{pedido_id}/transition-estado")
 def transition_estado_pedido(
@@ -191,8 +191,6 @@ def transition_estado_pedido(
         return error_response(message=str(e), status_code=400)
     except Exception as e:
         return error_response(message=f"Error en transición: {str(e)}", status_code=500)
-
-# ============ DETALLES PEDIDO ENDPOINTS ============
 
 @router.get("/{pedido_id}/detalles")
 def read_detalles_pedido(

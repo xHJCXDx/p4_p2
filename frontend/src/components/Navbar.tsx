@@ -24,7 +24,6 @@ const Navbar = () => {
         <div className="flex gap-6 items-center">
           {isAuthenticated && usuario ? (
             <>
-              {/* Usuario autenticado */}
               <span className="text-white text-sm">
                 Hola, <span className="font-semibold">{usuario.nombre}</span>
               </span>
@@ -93,7 +92,6 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              {/* No autenticado */}
               <Link
                 to="/store/home"
                 className="text-white hover:text-gray-100 font-semibold transition-colors"

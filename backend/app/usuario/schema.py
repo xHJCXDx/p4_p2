@@ -14,7 +14,7 @@ class RolRead(BaseModel):
 class UsuarioCreate(BaseModel):
     """Schema para crear un nuevo usuario."""
     nombre: str
-    apellido: Optional[str] = ""
+    apellido: str
     email: EmailStr
     password: str
     celular: Optional[str] = None

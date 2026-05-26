@@ -17,14 +17,12 @@ def get_direcciones_by_usuario(session: Session, usuario_id: int, limit: int = 1
 def create_direccion(session: Session, usuario_id: int, data: DireccionCreate) -> DireccionEntrega:
     """Crea una nueva dirección de entrega."""
     with DireccionEntregaUnitOfWork(session) as uow:
-        # Si es principal, desmarcar las otras direcciones del usuario
         if data.es_principal:
             principal_actual = uow.direcciones.get_principal(usuario_id)
             if principal_actual:
                 principal_actual.es_principal = False
                 session.add(principal_actual)
 
-        # Crear nueva dirección
         nueva_direccion = DireccionEntrega(
             usuario_id=usuario_id,
             alias=data.alias,
@@ -50,14 +48,12 @@ def get_direccion_by_id(session: Session, direccion_id: int) -> DireccionEntrega
 def update_direccion(session: Session, direccion: DireccionEntrega, data: DireccionUpdate) -> DireccionEntrega:
     """Actualiza una dirección."""
     with DireccionEntregaUnitOfWork(session) as uow:
-        # Si se marca como principal, desmarcar las otras
         if data.es_principal and not direccion.es_principal:
             principal_actual = uow.direcciones.get_principal(direccion.usuario_id)
             if principal_actual:
                 principal_actual.es_principal = False
                 session.add(principal_actual)
 
-        # Actualizar campos
         if data.alias:
             direccion.alias = data.alias
         if data.linea1:

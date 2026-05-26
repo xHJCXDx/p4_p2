@@ -1,12 +1,9 @@
-"""Modelos de Usuario, Rol y UsuarioRol."""
-
 from typing import Optional, List
 from datetime import datetime
 from sqlmodel import Field, Relationship, SQLModel
 
 
 class UsuarioRolLink(SQLModel, table=True):
-    """Tabla junction para relación many-to-many entre Usuario y Rol."""
     __tablename__ = "usuario_rol"
 
     usuario_id: Optional[int] = Field(default=None, foreign_key="usuario.id", primary_key=True)
@@ -36,7 +33,7 @@ class Rol(RolBase, table=True):
 
 class UsuarioBase(SQLModel):
     nombre: str = Field(max_length=80)
-    apellido: str = Field(default="", max_length=80)
+    apellido: str = Field(max_length=80)
     email: str = Field(index=True, unique=True, max_length=254)
     celular: Optional[str] = Field(default=None, max_length=20)
 

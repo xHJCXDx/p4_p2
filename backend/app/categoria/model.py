@@ -4,8 +4,8 @@ from sqlmodel import Field, Relationship, SQLModel
 from app.producto.model import ProductoCategoriaLink
 
 class CategoriaBase(SQLModel):
-    nombre: str = Field(index=True, unique=True)
-    descripcion: str
+    nombre: str = Field(index=True, unique=True, max_length=100)
+    descripcion: Optional[str] = None
     imagen_url: Optional[str] = None
 
 class Categoria(CategoriaBase, table=True):

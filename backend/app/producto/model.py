@@ -12,10 +12,11 @@ class ProductoIngredienteLink(SQLModel, table=True):
     producto_id: Optional[int] = Field(default=None, foreign_key="producto.id", primary_key=True)
     ingrediente_id: Optional[int] = Field(default=None, foreign_key="ingrediente.id", primary_key=True)
     es_removible: bool = Field(default=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class ProductoBase(SQLModel):
-    nombre: str = Field(index=True)
-    descripcion: str
+    nombre: str = Field(index=True, max_length=150)
+    descripcion: Optional[str] = None
     precio_base: float
     imagenes_url: List[str] = Field(default=[], sa_type=JSON)
     stock_cantidad: int = Field(default=0, ge=0)

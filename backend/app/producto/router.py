@@ -22,22 +22,18 @@ def read_productos(
     """Listado público de productos con filtros: categoría, disponibilidad, búsqueda."""
     statement = select(Producto)
 
-    # Filtro disponibilidad
     if disponible is not None:
         statement = statement.where(Producto.disponible == disponible)
 
-    # Filtro búsqueda por nombre (case-insensitive)
     if busqueda:
         statement = statement.where(Producto.nombre.ilike(f"%{busqueda}%"))
 
-    # Filtro categoría (requiere join)
     if categoria_id is not None:
         from app.producto.model import ProductoCategoriaLink
         statement = statement.join(ProductoCategoriaLink).where(
             ProductoCategoriaLink.categoria_id == categoria_id
         )
 
-    # Contar total
     count_statement = select(Producto)
     if disponible is not None:
         count_statement = count_statement.where(Producto.disponible == disponible)
@@ -50,7 +46,6 @@ def read_productos(
         )
     total = len(session.exec(count_statement).all())
 
-    # Aplicar paginación
     statement = statement.offset(offset).limit(limit)
     productos = session.exec(statement).all()
 
