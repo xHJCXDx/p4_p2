@@ -9,67 +9,15 @@
 
 ## Novedades en Parcial 2 vs TP Integrador (P4_P1)
 
-### Autenticación y Autorización
-- **JWT + RBAC**: Autenticación basada en tokens con roles y permisos
-- **Módulo Usuario**: Registro, login, gestión de usuarios
-- **Roles del Sistema**: ADMIN, GERENTE, REPARTIDOR, CLIENTE
-- **Protección de rutas**: Endpoints protegidos con decoradores `@require_auth`, `@require_role`
-- **Seed automático**: Usuario ADMIN por defecto (admin@admin.com / admin123)
+Parcial 2 amplía significativamente la funcionalidad del TP Integrador:
 
-### Gestión de Pedidos Completa
-- **FSM (Finite State Machine)**: Transiciones de estado validadas (PENDIENTE -> CONFIRMADO -> EN_PREP -> EN_CAMINO -> ENTREGADO)
-- **Snapshots de precios**: Copia immutable de precios/nombres en momentos de compra
-- **Detalles de pedido**: Relación con productos + descuentos + variaciones
-- **Sistema de pagos**: Integración con MercadoPago (estructura lista)
-- **Formas de pago**: MERCADOPAGO, EFECTIVO, TRANSFERENCIA
-
-### Direcciones y Entregas
-- **Módulo Dirección**: CRUD de direcciones de usuario
-- **Validación de entregas**: Campos requeridos (calle, número, ciudad, etc.)
-- **Múltiples direcciones por usuario**: Soporte para direcciones de envío diferentes
-
-### Panel Administrativo
-- **Módulo Admin**: Endpoints protegidos solo para ADMIN
-- **Gestión global**: Visualizar/editar pedidos, usuarios, productos
-- **Reportes**: Estadísticas de ventas, pedidos por estado
-
-### Tienda Pública
-- **HomeStorePage**: Catálogo de productos con filtros
-- **CarritoPage**: Carrito de compras con Zustand (state management)
-- **CheckoutPage**: Flujo de compra completo
-- **MisPedidosPage**: Historial de pedidos del usuario
-
-### Mejoras Arquitectónicas
-- **Unit of Work Pattern**: Transacciones atómicas, control de cambios
-- **Repository Pattern**: Abstracción de acceso a datos
-- **Service Layer**: Lógica de negocio centralizada
-- **Schemas Pydantic**: Validación automática de datos
-- **Response Envelope**: Respuestas estandarizadas en todos los endpoints
-
-### Base de Datos
-- **SQLModel**: Modelos híbridos (SQLAlchemy ORM + Pydantic)
-- **Soft Deletes**: Registros marcados `deleted_at` en lugar de borrados
-- **Auditoría**: `created_at`, `updated_at`, `deleted_at` en todas las tablas
-- **Relaciones complejas**: Many-to-Many (Producto-Categoría, Producto-Ingrediente), FK, auto-referencia
-
-### Frontend Moderno
-- **React 18 + TypeScript + Vite**
-- **Zustand**: State management para carrito y auth
-- **React Router v6**: Rutas protegidas con ProtectedRoute
-- **Tailwind CSS**: Diseño responsivo y moderno
-- **Hooks personalizados**: `useCategorias`, `useProductos`, `usePedidos`, `useIngredientes`
-- **Componentes reutilizables**: Navbar, CategoriaCard, ProductoTable, PedidoTable, Modales, etc.
-
-### Refactoring y Mejoras de Código
-- **Limpieza de routers**: Eliminación de lógica redundante
-- **Separación de concerns**: Routers -> Services -> Repository
-- **UoW context manager**: Manejo eficiente de transacciones
-- **BaseRepository**: Métodos genéricos reutilizables
-- **Seed data**: Sistema automático de datos iniciales
-
-### Prefijo de API
-- Todos los endpoints ahora usan `/api/v1/` como prefijo (versionamiento)
-- Ejemplo: `GET /api/v1/productos`, `POST /api/v1/pedidos`
+- **Autenticación y Autorización**: Sistema JWT con roles RBAC (ADMIN, GERENTE, REPARTIDOR, CLIENTE)
+- **Gestión de Pedidos**: Máquina de estados validada, detalles de compra con snapshots, historial de transiciones
+- **Módulos Nuevos**: Usuarios, Direcciones, Ingredientes, Panel Administrativo
+- **Tienda Pública**: Catálogo de productos, carrito, checkout y historial de pedidos del cliente
+- **Mejoras Backend**: Unit of Work Pattern, Repository Pattern, API versionada (`/api/v1/`)
+- **Mejoras Frontend**: React Router protegido, State Management con Zustand, TanStack Query para servidor
+- **Base de Datos**: PostgreSQL con soft deletes, auditoría automática y relaciones complejas
 
 ## Proyecto Full Stack: React + TypeScript + FastAPI
 
