@@ -19,9 +19,9 @@ export default function HomeStorePage() {
     addItem({
       producto_id: producto.id,
       nombre: producto.nombre,
-      precio: producto.precio,
+      precio: producto.precio_base,
       cantidad: 1,
-      imagen: producto.imagen,
+      imagen: producto.imagen_url,
     });
     alert(`${producto.nombre} agregado al carrito`);
   };
@@ -76,8 +76,8 @@ export default function HomeStorePage() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {productos.map((producto: any) => (
             <div key={producto.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              {producto.imagen && (
-                <img src={producto.imagen} alt={producto.nombre} className="w-full h-48 object-cover" />
+              {producto.imagen_url && (
+                <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-48 object-cover" />
               )}
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{producto.nombre}</h3>
@@ -85,7 +85,7 @@ export default function HomeStorePage() {
                   <p className="text-sm text-gray-600 mb-3">{producto.descripcion}</p>
                 )}
                 <div className="flex justify-between items-center">
-                  <span className="text-2xl font-bold text-blue-600">${producto.precio}</span>
+                  <span className="text-2xl font-bold text-blue-600">${producto.precio_base}</span>
                   <button
                     onClick={() => handleAddToCarrito(producto)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
