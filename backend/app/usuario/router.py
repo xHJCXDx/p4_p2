@@ -51,7 +51,7 @@ def login(
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.id},
+        data={"sub": str(user.id)},
         expires_delta=access_token_expires
     )
 
@@ -61,6 +61,7 @@ def login(
         httponly=True,
         secure=False,
         samesite="lax",
+        path="/",
         max_age=60 * ACCESS_TOKEN_EXPIRE_MINUTES
     )
 

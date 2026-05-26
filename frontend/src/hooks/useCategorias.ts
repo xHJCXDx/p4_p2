@@ -4,7 +4,6 @@ import { Categoria } from '../types/categoria';
 
 const API_URL = '/categorias';
 
-// Fetch all categorias
 const fetchCategorias = async (limit = 100, offset = 0, parentId?: number): Promise<Categoria[]> => {
   const params: Record<string, any> = { limit, offset };
   if (parentId !== undefined) {
@@ -15,13 +14,11 @@ const fetchCategorias = async (limit = 100, offset = 0, parentId?: number): Prom
   return response.data.data.items || [];
 };
 
-// Fetch single categoria
 const fetchCategoria = async (id: number): Promise<Categoria> => {
   const response = await apiClient.get<any>(`${API_URL}/${id}`);
   return response.data.data || response.data;
 };
 
-// Create categoria
 const createCategoria = async (
   data: Omit<Categoria, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Categoria> => {
@@ -29,7 +26,6 @@ const createCategoria = async (
   return response.data.data || response.data;
 };
 
-// Update categoria
 const updateCategoria = async (
   id: number,
   data: Omit<Categoria, 'id' | 'created_at' | 'updated_at'>
@@ -38,12 +34,10 @@ const updateCategoria = async (
   return response.data.data || response.data;
 };
 
-// Delete categoria
 const deleteCategoria = async (id: number): Promise<void> => {
   await apiClient.delete(`${API_URL}/${id}`);
 };
 
-// Hooks
 export const useCategorias = (limit = 100, offset = 0, parentId?: number) => {
   return useQuery({
     queryKey: ['categorias', limit, offset, parentId],

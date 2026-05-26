@@ -1,9 +1,9 @@
-from typing import List, Optional
+from typing import Optional
 from fastapi import APIRouter, Depends, status, Query
 from sqlmodel import Session
 from app.core.database import get_session
 from app.core.response import success_response, error_response, ApiResponse
-from app.core.security import require_roles, get_current_user
+from app.core.security import get_current_user
 from app.core.constants import ACCIONES_A_ESTADOS
 from app.venta.schema import (
     PedidoCreate, PedidoRead, PedidoUpdate,
@@ -11,7 +11,7 @@ from app.venta.schema import (
     PagoCreate, PagoRead, PagoUpdate,
     HistorialEstadoPedidoRead
 )
-from app.venta.model import Pedido, DetallePedido, Pago
+from app.venta.model import Pedido
 from app.usuario.model import Usuario
 from app.venta import service
 

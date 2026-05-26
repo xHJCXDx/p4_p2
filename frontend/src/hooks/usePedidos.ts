@@ -4,7 +4,6 @@ import { Pedido } from '../types/pedido';
 
 const API_URL = '/pedidos';
 
-// Fetch all pedidos
 const fetchPedidos = async (limit = 100, offset = 0): Promise<Pedido[]> => {
   const response = await apiClient.get<any>(API_URL, {
     params: { limit, offset },
@@ -12,13 +11,11 @@ const fetchPedidos = async (limit = 100, offset = 0): Promise<Pedido[]> => {
   return response.data.data.items || [];
 };
 
-// Fetch single pedido
 const fetchPedido = async (id: number): Promise<Pedido> => {
   const response = await apiClient.get<any>(`${API_URL}/${id}`);
   return response.data.data || response.data;
 };
 
-// Create pedido
 const createPedido = async (
   data: Omit<Pedido, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>
 ): Promise<Pedido> => {
@@ -26,7 +23,6 @@ const createPedido = async (
   return response.data.data || response.data;
 };
 
-// Update pedido
 const updatePedido = async (
   id: number,
   data: Omit<Pedido, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>
@@ -35,12 +31,10 @@ const updatePedido = async (
   return response.data.data || response.data;
 };
 
-// Delete pedido
 const deletePedido = async (id: number): Promise<void> => {
   await apiClient.delete(`${API_URL}/${id}`);
 };
 
-// Transition estado
 const transitionEstado = async (
   pedido_id: number,
   accion: string
@@ -53,7 +47,6 @@ const transitionEstado = async (
   return response.data.data || response.data;
 };
 
-// Hooks
 export const usePedidos = (limit = 100, offset = 0) => {
   return useQuery({
     queryKey: ['pedidos', limit, offset],

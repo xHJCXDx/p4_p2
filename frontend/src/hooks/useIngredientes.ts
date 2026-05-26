@@ -4,7 +4,6 @@ import { Ingrediente } from '../types/ingrediente';
 
 const API_URL = '/ingredientes';
 
-// Fetch all ingredientes
 const fetchIngredientes = async (limit = 100, offset = 0): Promise<Ingrediente[]> => {
   const response = await apiClient.get<any>(API_URL, {
     params: { limit, offset },
@@ -12,13 +11,11 @@ const fetchIngredientes = async (limit = 100, offset = 0): Promise<Ingrediente[]
   return response.data.data.items || [];
 };
 
-// Fetch single ingrediente
 const fetchIngrediente = async (id: number): Promise<Ingrediente> => {
   const response = await apiClient.get<any>(`${API_URL}/${id}`);
   return response.data.data || response.data;
 };
 
-// Create ingrediente
 const createIngrediente = async (
   data: Omit<Ingrediente, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Ingrediente> => {
@@ -26,7 +23,6 @@ const createIngrediente = async (
   return response.data.data || response.data;
 };
 
-// Update ingrediente
 const updateIngrediente = async (
   id: number,
   data: Omit<Ingrediente, 'id' | 'created_at' | 'updated_at'>
@@ -35,12 +31,10 @@ const updateIngrediente = async (
   return response.data.data || response.data;
 };
 
-// Delete ingrediente
 const deleteIngrediente = async (id: number): Promise<void> => {
   await apiClient.delete(`${API_URL}/${id}`);
 };
 
-// Hooks
 export const useIngredientes = (limit = 100, offset = 0) => {
   return useQuery({
     queryKey: ['ingredientes', limit, offset],

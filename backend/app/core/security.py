@@ -1,7 +1,7 @@
 """Seguridad: JWT, hash de contraseñas, y dependencies de autenticación."""
 
 from datetime import datetime, timedelta
-from typing import Optional, List
+from typing import Optional
 import jwt
 import bcrypt
 from fastapi import Depends, HTTPException, status, Request
@@ -75,12 +75,14 @@ def get_current_user(request: Request, session: Session = Depends(get_session)):
         )
 
     payload = verify_token(token)
-    user_id: int = payload.get("sub")
-    if not user_id:
+    sub = payload.get("sub")
+    if not sub:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido"
         )
+
+    user_id = int(sub)
 
     # Obtener usuario de la BD
     user = session.get(Usuario, user_id)

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from fastapi import APIRouter, Depends, status, Query
 from sqlmodel import Session, select
 from app.core.database import get_session

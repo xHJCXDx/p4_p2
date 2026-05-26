@@ -4,13 +4,11 @@ import { DireccionEntrega } from '../types/direccion';
 
 const API_URL = '/direcciones';
 
-// Fetch all direcciones del usuario
 const fetchDirecciones = async (): Promise<DireccionEntrega[]> => {
   const response = await apiClient.get<any>(API_URL);
   return response.data.data.items || [];
 };
 
-// Create direccion
 const createDireccion = async (
   data: Omit<DireccionEntrega, 'id' | 'usuario_id' | 'created_at' | 'updated_at' | 'deleted_at'>
 ): Promise<DireccionEntrega> => {
@@ -18,7 +16,6 @@ const createDireccion = async (
   return response.data.data || response.data;
 };
 
-// Update direccion
 const updateDireccion = async (
   id: number,
   data: Partial<Omit<DireccionEntrega, 'id' | 'usuario_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
@@ -27,13 +24,11 @@ const updateDireccion = async (
   return response.data.data || response.data;
 };
 
-// Set as principal
 const setAsPrincipal = async (id: number): Promise<DireccionEntrega> => {
   const response = await apiClient.patch<any>(`${API_URL}/${id}/principal`);
   return response.data.data || response.data;
 };
 
-// Hooks
 export const useDirecciones = () => {
   return useQuery({
     queryKey: ['direcciones'],

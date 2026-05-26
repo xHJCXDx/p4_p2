@@ -21,8 +21,13 @@ export default function LoginPage() {
     login(
       { email, password },
       {
-        onSuccess: () => {
-          navigate('/admin');
+        onSuccess: (user: any) => {
+          const roles: string[] = user.roles || [];
+          if (roles.includes('ADMIN') || roles.includes('PEDIDOS') || roles.includes('STOCK')) {
+            navigate('/admin');
+          } else {
+            navigate('/store/home');
+          }
         },
         onError: (err: any) => {
           setError(err.response?.data?.message || err.message || 'Credenciales inválidas');

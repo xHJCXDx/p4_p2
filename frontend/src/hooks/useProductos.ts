@@ -12,7 +12,6 @@ interface FetchProductosParams {
   busqueda?: string;
 }
 
-// Fetch all productos
 const fetchProductos = async (params: FetchProductosParams = {}): Promise<Producto[]> => {
   const { limit = 100, offset = 0, ...filters } = params;
   const queryParams: Record<string, any> = { limit, offset, ...filters };
@@ -21,13 +20,11 @@ const fetchProductos = async (params: FetchProductosParams = {}): Promise<Produc
   return response.data.data.items || [];
 };
 
-// Fetch single producto
 const fetchProducto = async (id: number): Promise<Producto> => {
   const response = await apiClient.get<any>(`${API_URL}/${id}`);
   return response.data.data || response.data;
 };
 
-// Create producto
 const createProducto = async (
   data: Omit<Producto, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Producto> => {
@@ -35,7 +32,6 @@ const createProducto = async (
   return response.data.data || response.data;
 };
 
-// Update producto
 const updateProducto = async (
   id: number,
   data: Omit<Producto, 'id' | 'created_at' | 'updated_at'>
@@ -44,12 +40,10 @@ const updateProducto = async (
   return response.data.data || response.data;
 };
 
-// Delete producto
 const deleteProducto = async (id: number): Promise<void> => {
   await apiClient.delete(`${API_URL}/${id}`);
 };
 
-// Update disponibilidad
 const updateDisponibilidad = async (id: number, disponible: boolean): Promise<Producto> => {
   const response = await apiClient.patch<any>(`${API_URL}/${id}/disponibilidad`, {
     disponible,
@@ -57,7 +51,6 @@ const updateDisponibilidad = async (id: number, disponible: boolean): Promise<Pr
   return response.data.data || response.data;
 };
 
-// Hooks
 export const useProductos = (params: FetchProductosParams = {}) => {
   return useQuery({
     queryKey: ['productos', params],
