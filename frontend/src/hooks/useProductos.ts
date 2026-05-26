@@ -17,22 +17,22 @@ const fetchProductos = async (params: FetchProductosParams = {}): Promise<Produc
   const { limit = 100, offset = 0, ...filters } = params;
   const queryParams: Record<string, any> = { limit, offset, ...filters };
 
-  const response = await apiClient.get<Producto[]>(API_URL, { params: queryParams });
-  return response.data;
+  const response = await apiClient.get<any>(API_URL, { params: queryParams });
+  return response.data.data.items || [];
 };
 
 // Fetch single producto
 const fetchProducto = async (id: number): Promise<Producto> => {
-  const response = await apiClient.get<Producto>(`${API_URL}/${id}`);
-  return response.data;
+  const response = await apiClient.get<any>(`${API_URL}/${id}`);
+  return response.data.data || response.data;
 };
 
 // Create producto
 const createProducto = async (
   data: Omit<Producto, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Producto> => {
-  const response = await apiClient.post<Producto>(API_URL, data);
-  return response.data;
+  const response = await apiClient.post<any>(API_URL, data);
+  return response.data.data || response.data;
 };
 
 // Update producto
@@ -40,8 +40,8 @@ const updateProducto = async (
   id: number,
   data: Omit<Producto, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Producto> => {
-  const response = await apiClient.put<Producto>(`${API_URL}/${id}`, data);
-  return response.data;
+  const response = await apiClient.put<any>(`${API_URL}/${id}`, data);
+  return response.data.data || response.data;
 };
 
 // Delete producto
@@ -51,10 +51,10 @@ const deleteProducto = async (id: number): Promise<void> => {
 
 // Update disponibilidad
 const updateDisponibilidad = async (id: number, disponible: boolean): Promise<Producto> => {
-  const response = await apiClient.patch<Producto>(`${API_URL}/${id}/disponibilidad`, {
+  const response = await apiClient.patch<any>(`${API_URL}/${id}/disponibilidad`, {
     disponible,
   });
-  return response.data;
+  return response.data.data || response.data;
 };
 
 // Hooks

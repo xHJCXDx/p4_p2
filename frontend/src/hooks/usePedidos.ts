@@ -6,24 +6,24 @@ const API_URL = '/pedidos';
 
 // Fetch all pedidos
 const fetchPedidos = async (limit = 100, offset = 0): Promise<Pedido[]> => {
-  const response = await apiClient.get<Pedido[]>(API_URL, {
+  const response = await apiClient.get<any>(API_URL, {
     params: { limit, offset },
   });
-  return response.data;
+  return response.data.data.items || [];
 };
 
 // Fetch single pedido
 const fetchPedido = async (id: number): Promise<Pedido> => {
-  const response = await apiClient.get<Pedido>(`${API_URL}/${id}`);
-  return response.data;
+  const response = await apiClient.get<any>(`${API_URL}/${id}`);
+  return response.data.data || response.data;
 };
 
 // Create pedido
 const createPedido = async (
   data: Omit<Pedido, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>
 ): Promise<Pedido> => {
-  const response = await apiClient.post<Pedido>(API_URL, data);
-  return response.data;
+  const response = await apiClient.post<any>(API_URL, data);
+  return response.data.data || response.data;
 };
 
 // Update pedido
@@ -31,8 +31,8 @@ const updatePedido = async (
   id: number,
   data: Omit<Pedido, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>
 ): Promise<Pedido> => {
-  const response = await apiClient.put<Pedido>(`${API_URL}/${id}`, data);
-  return response.data;
+  const response = await apiClient.put<any>(`${API_URL}/${id}`, data);
+  return response.data.data || response.data;
 };
 
 // Delete pedido
@@ -45,12 +45,12 @@ const transitionEstado = async (
   pedido_id: number,
   accion: string
 ): Promise<Pedido> => {
-  const response = await apiClient.post<Pedido>(
+  const response = await apiClient.post<any>(
     `${API_URL}/${pedido_id}/transition-estado`,
     {},
     { params: { accion } }
   );
-  return response.data;
+  return response.data.data || response.data;
 };
 
 // Hooks

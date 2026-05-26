@@ -20,12 +20,12 @@ export function useLogin() {
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
       const response = await apiClient.post('/auth/login', credentials);
-      return response.data;
+      return response.data.data || response.data;
     },
     onSuccess: () => {
       // Obtener datos del usuario después del login
       return apiClient.get('/auth/me').then((res) => {
-        setUsuario(res.data);
+        setUsuario(res.data.data || res.data);
         return res.data;
       });
     },

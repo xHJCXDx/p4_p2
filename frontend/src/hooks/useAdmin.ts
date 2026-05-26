@@ -22,8 +22,8 @@ const fetchUsuarios = async (params: GetUsuariosParams = {}): Promise<Usuario[]>
   const { limit = 100, offset = 0, ...filters } = params;
   const queryParams: Record<string, any> = { limit, offset, ...filters };
 
-  const response = await apiClient.get<Usuario[]>(API_URL, { params: queryParams });
-  return response.data;
+  const response = await apiClient.get<any>(API_URL, { params: queryParams });
+  return response.data.data.items || [];
 };
 
 // Update usuario
@@ -31,8 +31,8 @@ const updateUsuario = async (
   id: number,
   data: Partial<Omit<Usuario, 'id' | 'created_at'>>
 ): Promise<Usuario> => {
-  const response = await apiClient.put<Usuario>(`${API_URL}/${id}`, data);
-  return response.data;
+  const response = await apiClient.put<any>(`${API_URL}/${id}`, data);
+  return response.data.data || response.data;
 };
 
 // Delete usuario
@@ -42,8 +42,8 @@ const deleteUsuario = async (id: number): Promise<void> => {
 
 // Assign roles
 const assignRoles = async (id: number, roles: string[]): Promise<Usuario> => {
-  const response = await apiClient.post<Usuario>(`${API_URL}/${id}/roles`, { roles });
-  return response.data;
+  const response = await apiClient.post<any>(`${API_URL}/${id}/roles`, { roles });
+  return response.data.data || response.data;
 };
 
 // Hooks

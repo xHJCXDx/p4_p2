@@ -11,22 +11,22 @@ const fetchCategorias = async (limit = 100, offset = 0, parentId?: number): Prom
     params.parent_id = parentId;
   }
 
-  const response = await apiClient.get<Categoria[]>(API_URL, { params });
-  return response.data;
+  const response = await apiClient.get<any>(API_URL, { params });
+  return response.data.data.items || [];
 };
 
 // Fetch single categoria
 const fetchCategoria = async (id: number): Promise<Categoria> => {
-  const response = await apiClient.get<Categoria>(`${API_URL}/${id}`);
-  return response.data;
+  const response = await apiClient.get<any>(`${API_URL}/${id}`);
+  return response.data.data || response.data;
 };
 
 // Create categoria
 const createCategoria = async (
   data: Omit<Categoria, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Categoria> => {
-  const response = await apiClient.post<Categoria>(API_URL, data);
-  return response.data;
+  const response = await apiClient.post<any>(API_URL, data);
+  return response.data.data || response.data;
 };
 
 // Update categoria
@@ -34,8 +34,8 @@ const updateCategoria = async (
   id: number,
   data: Omit<Categoria, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Categoria> => {
-  const response = await apiClient.put<Categoria>(`${API_URL}/${id}`, data);
-  return response.data;
+  const response = await apiClient.put<any>(`${API_URL}/${id}`, data);
+  return response.data.data || response.data;
 };
 
 // Delete categoria
