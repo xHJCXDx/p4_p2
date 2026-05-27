@@ -43,3 +43,9 @@ class UsuarioUpdate(BaseModel):
     apellido: Optional[str] = None
     email: Optional[EmailStr] = None
     celular: Optional[str] = None
+
+
+class PasswordChange(BaseModel):
+    """Schema para cambiar contraseña."""
+    current_password: str
+    new_password: str

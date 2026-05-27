@@ -10,6 +10,16 @@ from app.categoria import service
 
 router = APIRouter(prefix="/api/v1/categorias", tags=["Categorias"])
 
+
+def _build_categoria_read(categoria: Categoria, session: Session) -> CategoriaRead:
+    data = CategoriaRead.model_validate(categoria)
+    if categoria.parent_id:
+        parent = session.get(Categoria, categoria.parent_id)
+        if parent:
+            data.parent_nombre = parent.nombre
+    return data
+
+
 @router.get("/")
 def read_categorias(
     session: Session = Depends(get_session),
@@ -28,7 +38,7 @@ def read_categorias(
 
     return success_response(
         data={
-            "items": [CategoriaRead.model_validate(c) for c in categorias],
+            "items": [_build_categoria_read(c, session) for c in categorias],
             "total": total,
             "limit": limit,
             "offset": offset
@@ -41,7 +51,7 @@ def create_categoria(categoria: CategoriaCreate, session: Session = Depends(get_
     """Crear categoría (solo ADMIN)."""
     new_categoria = service.create(session, categoria)
     return success_response(
-        data=CategoriaRead.model_validate(new_categoria),
+        data=_build_categoria_read(new_categoria, session),
         message="Categoría creada exitosamente",
         status_code=201
     )
@@ -54,7 +64,7 @@ def update_categoria(categoria_id: int, categoria: CategoriaUpdate, session: Ses
         return error_response(message="Categoría no encontrada", status_code=404)
     updated_categoria = service.update(session, db_categoria, categoria)
     return success_response(
-        data=CategoriaRead.model_validate(updated_categoria),
+        data=_build_categoria_read(updated_categoria, session),
         message="Categoría actualizada exitosamente"
     )
 

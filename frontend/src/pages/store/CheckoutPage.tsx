@@ -144,7 +144,7 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={isPending || !selectedDireccionId}
-              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPending ? 'Creando pedido...' : 'Crear pedido'}
             </button>

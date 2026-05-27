@@ -26,9 +26,6 @@ def read_productos(
         selectinload(Producto.ingredientes),
     )
 
-    if disponible is not None:
-        statement = statement.where(Producto.disponible == disponible)
-
     if busqueda:
         statement = statement.where(Producto.nombre.ilike(f"%{busqueda}%"))
 
@@ -39,8 +36,6 @@ def read_productos(
         )
 
     count_statement = select(Producto).where(Producto.deleted_at.is_(None))
-    if disponible is not None:
-        count_statement = count_statement.where(Producto.disponible == disponible)
     if busqueda:
         count_statement = count_statement.where(Producto.nombre.ilike(f"%{busqueda}%"))
     if categoria_id is not None:
@@ -53,9 +48,16 @@ def read_productos(
     statement = statement.offset(offset).limit(limit)
     productos = session.exec(statement).unique().all()
 
+    # Construir respuesta con stock calculado
+    items = [service.build_producto_read(session, p) for p in productos]
+
+    # Filtrar por disponibilidad si se pidió (post-cálculo)
+    if disponible is not None:
+        items = [p for p in items if p.disponible == disponible]
+
     return success_response(
         data={
-            "items": [ProductoRead.model_validate(p) for p in productos],
+            "items": items,
             "total": total,
             "limit": limit,
             "offset": offset
@@ -75,7 +77,7 @@ def read_producto(producto_id: int, session: Session = Depends(get_session)) -> 
     if not producto:
         return error_response(message="Producto no encontrado", status_code=404)
     return success_response(
-        data=ProductoRead.model_validate(producto),
+        data=service.build_producto_read(session, producto),
         message="Producto obtenido exitosamente"
     )
 
@@ -84,7 +86,7 @@ def create_producto(producto: ProductoCreate, session: Session = Depends(get_ses
     """Crear producto (solo ADMIN)."""
     new_producto = service.create(session, producto)
     return success_response(
-        data=ProductoRead.model_validate(new_producto),
+        data=service.build_producto_read(session, new_producto),
         message="Producto creado exitosamente",
         status_code=201
     )
@@ -97,7 +99,7 @@ def update_producto(producto_id: int, producto: ProductoUpdate, session: Session
         return error_response(message="Producto no encontrado", status_code=404)
     updated_producto = service.update(session, db_producto, producto)
     return success_response(
-        data=ProductoRead.model_validate(updated_producto),
+        data=service.build_producto_read(session, updated_producto),
         message="Producto actualizado exitosamente"
     )
 
@@ -111,20 +113,4 @@ def delete_producto(producto_id: int, session: Session = Depends(get_session)) -
     return success_response(
         message="Producto eliminado exitosamente",
         status_code=204
-    )
-
-@router.patch("/{producto_id}/disponibilidad", dependencies=[Depends(require_roles("ADMIN", "STOCK"))])
-def toggle_disponibilidad(producto_id: int, disponible: bool = Query(...), session: Session = Depends(get_session)) -> ApiResponse:
-    """Activar/desactivar disponibilidad de un producto (ADMIN o STOCK)."""
-    db_producto = service.get_by_id(session, producto_id)
-    if not db_producto:
-        return error_response(message="Producto no encontrado", status_code=404)
-
-    db_producto.disponible = disponible
-    session.add(db_producto)
-    session.commit()
-
-    return success_response(
-        data=ProductoRead.model_validate(db_producto),
-        message=f"Producto {'activado' if disponible else 'desactivado'} exitosamente"
     )

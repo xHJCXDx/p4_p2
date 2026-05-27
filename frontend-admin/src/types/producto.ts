@@ -7,6 +7,8 @@ export interface IngredienteInProducto {
   id: number;
   nombre: string;
   es_alergeno: boolean;
+  cantidad: number;
+  es_removible: boolean;
 }
 
 export interface Producto {
@@ -23,13 +25,17 @@ export interface Producto {
   updated_at?: string;
 }
 
+export interface IngredienteEnReceta {
+  ingrediente_id: number;
+  cantidad: number;
+  es_removible: boolean;
+}
+
 export interface ProductoCreate {
   nombre: string;
   descripcion: string;
   precio_base: number;
   imagen_url?: string;
-  stock_cantidad?: number;
-  disponible?: boolean;
   categoria_ids?: number[];
-  ingrediente_ids?: number[];
+  ingredientes?: IngredienteEnReceta[];
 }

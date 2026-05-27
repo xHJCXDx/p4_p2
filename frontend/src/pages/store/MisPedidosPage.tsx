@@ -18,7 +18,7 @@ export default function MisPedidosPage() {
       case 'PENDIENTE':
         return 'bg-yellow-100 text-yellow-800';
       case 'CONFIRMADO':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-gray-200 text-gray-800';
       case 'EN_PREP':
         return 'bg-purple-100 text-purple-800';
       case 'EN_CAMINO':

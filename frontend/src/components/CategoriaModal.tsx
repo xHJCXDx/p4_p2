@@ -31,11 +31,14 @@ const CategoriaModal = ({ isOpen, onClose, onSubmit, categoriaInitial }: Props) 
   const parentOptions = categorias.filter((c) => c.id !== categoriaInitial?.id);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4">
-        <h2 className="text-2xl font-bold mb-6">
-          {categoriaInitial ? 'Editar Categoría' : 'Nueva Categoría'}
-        </h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full lg:w-[80vw] lg:max-w-[80vw] max-h-[90vh] overflow-y-auto">
+        <div className="bg-gray-800 text-white p-6 rounded-t-lg">
+          <h3 className="text-xl font-bold">
+            {categoriaInitial ? 'Editar Categoría' : 'Nueva Categoría'}
+          </h3>
+        </div>
+        <div className="p-6">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -119,12 +122,13 @@ const CategoriaModal = ({ isOpen, onClose, onSubmit, categoriaInitial }: Props) 
             </button>
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors"
+              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors"
             >
               Guardar
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

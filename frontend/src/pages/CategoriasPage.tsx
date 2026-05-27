@@ -84,7 +84,7 @@ function CategoriasPage() {
         <h2 className="text-3xl font-bold text-gray-800">Categorías</h2>
         <button
           onClick={openCreateModal}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-lg"
+          className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-lg"
         >
           + Nueva Categoría
         </button>

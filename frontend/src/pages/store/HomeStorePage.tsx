@@ -39,7 +39,7 @@ export default function HomeStorePage() {
             placeholder="Buscar productos..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
           />
         </div>
 
@@ -51,7 +51,7 @@ export default function HomeStorePage() {
               onClick={() => setSelectedCategoriaId(undefined)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 selectedCategoriaId === undefined
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-gray-800 text-white'
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -63,7 +63,7 @@ export default function HomeStorePage() {
                 onClick={() => setSelectedCategoriaId(cat.id)}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   selectedCategoriaId === cat.id
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-gray-800 text-white'
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -106,7 +106,7 @@ export default function HomeStorePage() {
                           key={ing.id}
                           className={`text-xs px-2 py-0.5 rounded-full ${
                             ing.es_alergeno
-                              ? 'bg-red-100 text-red-700 font-semibold'
+                              ? 'bg-yellow-100 text-yellow-800 font-semibold'
                               : 'bg-gray-100 text-gray-600'
                           }`}
                         >
@@ -129,7 +129,7 @@ export default function HomeStorePage() {
                     </Link>
                     <button
                       onClick={() => handleAddToCarrito(producto)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
                     >
                       Agregar
                     </button>

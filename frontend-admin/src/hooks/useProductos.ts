@@ -44,13 +44,6 @@ const deleteProducto = async (id: number): Promise<void> => {
   await apiClient.delete(`${API_URL}/${id}`);
 };
 
-const updateDisponibilidad = async (id: number, disponible: boolean): Promise<Producto> => {
-  const response = await apiClient.patch<any>(`${API_URL}/${id}/disponibilidad`, {
-    disponible,
-  });
-  return response.data.data || response.data;
-};
-
 export const useProductos = (params: FetchProductosParams = {}) => {
   return useQuery({
     queryKey: ['productos', params],
@@ -106,14 +99,3 @@ export const useDeleteProducto = () => {
   });
 };
 
-export const useUpdateDisponibilidad = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, disponible }: { id: number; disponible: boolean }) =>
-      updateDisponibilidad(id, disponible),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['productos'] });
-    },
-  });
-};

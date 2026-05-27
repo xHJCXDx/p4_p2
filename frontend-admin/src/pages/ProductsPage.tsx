@@ -8,7 +8,6 @@ import {
   useCreateProducto,
   useUpdateProducto,
   useDeleteProducto,
-  useUpdateDisponibilidad,
 } from '../hooks/useProductos';
 
 function ProductsPage() {
@@ -23,7 +22,6 @@ function ProductsPage() {
   const createMutation = useCreateProducto();
   const updateMutation = useUpdateProducto();
   const deleteMutation = useDeleteProducto();
-  const disponibilidadMutation = useUpdateDisponibilidad();
 
   const handleCreate = async (data: Omit<Producto, 'id'>) => {
     try {
@@ -50,22 +48,13 @@ function ProductsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
+    if (!window.confirm('Estas seguro de eliminar este producto?')) return;
     try {
       await deleteMutation.mutateAsync(id);
     } catch (err) {
       console.error('Error deleting producto:', err);
       setError('Error al eliminar el producto');
     }
-  };
-
-  const handleToggleDisponibilidad = (producto: Producto) => {
-    disponibilidadMutation.mutate(
-      { id: producto.id, disponible: !producto.disponible },
-      {
-        onError: () => setError('Error al cambiar disponibilidad'),
-      }
-    );
   };
 
   const openCreateModal = () => {
@@ -99,7 +88,7 @@ function ProductsPage() {
         {isAdmin ? (
           <button
             onClick={openCreateModal}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-lg"
+            className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-lg"
           >
             + Nuevo Producto
           </button>
@@ -119,7 +108,6 @@ function ProductsPage() {
           data={productos}
           onEdit={isAdmin ? openEditModal : undefined}
           onDelete={isAdmin ? handleDelete : undefined}
-          onToggleDisponibilidad={handleToggleDisponibilidad}
           isLoading={isLoading}
           isAdmin={isAdmin}
         />

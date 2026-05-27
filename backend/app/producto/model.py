@@ -11,6 +11,7 @@ class ProductoCategoriaLink(SQLModel, table=True):
 class ProductoIngredienteLink(SQLModel, table=True):
     producto_id: Optional[int] = Field(default=None, foreign_key="producto.id", primary_key=True)
     ingrediente_id: Optional[int] = Field(default=None, foreign_key="ingrediente.id", primary_key=True)
+    cantidad: int = Field(default=1, ge=1)
     es_removible: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -19,8 +20,6 @@ class ProductoBase(SQLModel):
     descripcion: Optional[str] = None
     precio_base: float
     imagenes_url: List[str] = Field(default=[], sa_type=JSON)
-    stock_cantidad: int = Field(default=0, ge=0)
-    disponible: bool = Field(default=True)
 
 class Producto(ProductoBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

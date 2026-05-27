@@ -15,14 +15,13 @@ interface ProductoTableProps {
   data: Producto[];
   onEdit?: (producto: Producto) => void;
   onDelete?: (id: number) => void;
-  onToggleDisponibilidad?: (producto: Producto) => void;
   isLoading?: boolean;
   isAdmin?: boolean;
 }
 
 const columnHelper = createColumnHelper<Producto>();
 
-export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, isLoading = false, isAdmin = true }: ProductoTableProps) {
+export function ProductoTable({ data, onEdit, onDelete, isLoading = false, isAdmin = true }: ProductoTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
 
@@ -50,7 +49,7 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
         cell: (info) => {
           const val = info.getValue();
           return (
-            <span className={val > 0 ? 'text-gray-700' : 'text-red-600 font-bold'}>
+            <span className={val > 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-bold'}>
               {val}
             </span>
           );
@@ -58,11 +57,20 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
         enableSorting: true,
         size: 70,
       }),
+      columnHelper.accessor('disponible', {
+        header: 'Disponible',
+        cell: (info) => (
+          <span className={info.getValue() ? 'text-green-600 font-bold' : 'text-red-600'}>
+            {info.getValue() ? 'Si' : 'No'}
+          </span>
+        ),
+        size: 90,
+      }),
       columnHelper.accessor('categorias', {
-        header: 'Categorías',
+        header: 'Categorias',
         cell: (info) => {
           const cats = info.getValue() || [];
-          if (cats.length === 0) return <span className="text-gray-400 text-sm">Sin categoría</span>;
+          if (cats.length === 0) return <span className="text-gray-400 text-sm">Sin categoria</span>;
           return (
             <div className="flex flex-wrap gap-1">
               {cats.map((c) => (
@@ -87,26 +95,17 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
                   key={i.id}
                   className={`text-xs px-2 py-0.5 rounded-full ${
                     i.es_alergeno
-                      ? 'bg-red-100 text-red-700'
+                      ? 'bg-yellow-100 text-yellow-800'
                       : 'bg-green-100 text-green-700'
                   }`}
                 >
-                  {i.nombre}{i.es_alergeno ? ' (A)' : ''}
+                  {i.nombre} x{i.cantidad}
                 </span>
               ))}
             </div>
           );
         },
         enableSorting: false,
-      }),
-      columnHelper.accessor('disponible', {
-        header: 'Disponible',
-        cell: (info) => (
-          <span className={info.getValue() ? 'text-green-600 font-bold' : 'text-red-600'}>
-            {info.getValue() ? '✓ Sí' : '✗ No'}
-          </span>
-        ),
-        size: 90,
       }),
       columnHelper.display({
         id: 'actions',
@@ -129,21 +128,9 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
                 Eliminar
               </button>
             )}
-            {onToggleDisponibilidad && (
-              <button
-                onClick={() => onToggleDisponibilidad(info.row.original)}
-                className={`font-bold py-1 px-2 rounded text-sm transition-colors ${
-                  info.row.original.disponible
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                    : 'bg-green-500 hover:bg-green-600 text-white'
-                }`}
-              >
-                {info.row.original.disponible ? 'Desactivar' : 'Activar'}
-              </button>
-            )}
           </div>
         ),
-        size: 250,
+        size: 180,
       }),
     ],
     [onEdit, onDelete]
@@ -167,18 +154,16 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
 
   return (
     <div className="space-y-4">
-      {/* Buscador */}
       <div className="mb-4">
         <input
           type="text"
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder="Buscar por nombre..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
         />
       </div>
 
-      {/* Tabla */}
       <div className="overflow-x-auto border border-gray-300 rounded-lg">
         <table className="w-full">
           <thead className="bg-gray-200 border-b border-gray-300">
@@ -193,14 +178,6 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
                   >
                     <div className="flex items-center gap-2">
                       {flexRender(header.column.columnDef.header, header.getContext())}
-                      {header.column.getCanSort() && (
-                        <span className="text-xs">
-                          {{
-                            asc: ' 🔼',
-                            desc: ' 🔽',
-                          }[header.column.getIsSorted() as string] ?? ''}
-                        </span>
-                      )}
                     </div>
                   </th>
                 ))}
@@ -239,7 +216,6 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
         </table>
       </div>
 
-      {/* Paginación */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">
           Mostrando {table.getRowModel().rows.length} de {table.getFilteredRowModel().rows.length} productos
@@ -250,7 +226,7 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
             disabled={!table.getCanPreviousPage()}
             className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            ← Anterior
+            Anterior
           </button>
           <div className="flex items-center gap-2">
             {Array.from({ length: table.getPageCount() }, (_, i) => i).map((page) => (
@@ -259,7 +235,7 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
                 onClick={() => table.setPageIndex(page)}
                 className={`px-3 py-2 rounded-lg ${
                   table.getState().pagination.pageIndex === page
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-gray-800 text-white'
                     : 'border border-gray-300 hover:bg-gray-100'
                 }`}
               >
@@ -272,7 +248,7 @@ export function ProductoTable({ data, onEdit, onDelete, onToggleDisponibilidad, 
             disabled={!table.getCanNextPage()}
             className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Siguiente →
+            Siguiente
           </button>
         </div>
       </div>

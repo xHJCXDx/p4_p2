@@ -5,7 +5,8 @@ from app.venta.model import Pedido, DetallePedido, Pago, HistorialEstadoPedido
 from app.venta.schema import PedidoCreate, PedidoCreateFromCheckout, PedidoUpdate, DetallePedidoCreate, PagoCreate
 from app.venta.unit_of_work import VentaUnitOfWork
 from app.core.constants import TRANSICIONES_PERMITIDAS
-from app.producto.model import Producto
+from app.producto.model import Producto, ProductoIngredienteLink
+from app.ingrediente.model import Ingrediente
 
 
 # ============ PEDIDO SERVICE ============
@@ -50,28 +51,53 @@ def create_pedido(session: Session, pedido_data: PedidoCreate) -> Pedido:
 def create_pedido_from_checkout(session: Session, checkout_data: PedidoCreateFromCheckout, usuario_id: int) -> Pedido:
     """
     Crea pedido completo desde el checkout del cliente.
-    Valida stock, calcula totales, crea detalles con snapshot, y descuenta stock.
+    Valida stock de ingredientes, calcula totales, crea detalles con snapshot,
+    y descuenta stock de los ingredientes.
     """
     if not checkout_data.linea_ventas:
         raise ValueError("El pedido debe tener al menos un producto")
 
-    # Validar stock y calcular subtotal
+    from sqlmodel import select
+
+    # Validar stock de ingredientes y calcular subtotal
     subtotal = 0.0
     productos_info = []
+    # Acumular consumo total de cada ingrediente para validar ANTES de descontar
+    consumo_ingredientes: dict[int, int] = {}
+
     for linea in checkout_data.linea_ventas:
         producto = session.get(Producto, linea.producto_id)
         if not producto or producto.deleted_at is not None:
             raise ValueError(f"Producto {linea.producto_id} no existe o fue eliminado")
-        if not producto.disponible:
-            raise ValueError(f"Producto '{producto.nombre}' no está disponible")
-        if producto.stock_cantidad < linea.cantidad:
-            raise ValueError(
-                f"Stock insuficiente para '{producto.nombre}': "
-                f"disponible {producto.stock_cantidad}, solicitado {linea.cantidad}"
+
+        # Obtener receta del producto
+        links = session.exec(
+            select(ProductoIngredienteLink).where(
+                ProductoIngredienteLink.producto_id == producto.id
             )
+        ).all()
+
+        # Acumular consumo de ingredientes
+        for link in links:
+            total_necesario = link.cantidad * linea.cantidad
+            consumo_ingredientes[link.ingrediente_id] = (
+                consumo_ingredientes.get(link.ingrediente_id, 0) + total_necesario
+            )
+
         linea_subtotal = producto.precio_base * linea.cantidad
         subtotal += linea_subtotal
         productos_info.append((producto, linea.cantidad, linea_subtotal))
+
+    # Validar que hay stock suficiente de cada ingrediente
+    for ing_id, cantidad_necesaria in consumo_ingredientes.items():
+        ingrediente = session.get(Ingrediente, ing_id)
+        if not ingrediente or ingrediente.deleted_at is not None:
+            raise ValueError(f"Ingrediente {ing_id} no existe o fue eliminado")
+        if ingrediente.stock_cantidad < cantidad_necesaria:
+            raise ValueError(
+                f"Stock insuficiente de ingrediente '{ingrediente.nombre}': "
+                f"disponible {ingrediente.stock_cantidad}, necesario {cantidad_necesaria}"
+            )
 
     costo_envio = 50.0
     total = subtotal + costo_envio
@@ -91,7 +117,7 @@ def create_pedido_from_checkout(session: Session, checkout_data: PedidoCreateFro
         pedido = uow.pedidos.create(pedido)
         uow.pedidos.flush()
 
-        # Crear detalles con snapshot y descontar stock
+        # Crear detalles con snapshot
         for producto, cantidad, linea_subtotal in productos_info:
             detalle = DetallePedido(
                 pedido_id=pedido.id,
@@ -103,11 +129,11 @@ def create_pedido_from_checkout(session: Session, checkout_data: PedidoCreateFro
             )
             uow.detalles.create(detalle)
 
-            # Descontar stock
-            producto.stock_cantidad -= cantidad
-            if producto.stock_cantidad == 0:
-                producto.disponible = False
-            session.add(producto)
+        # Descontar stock de ingredientes
+        for ing_id, cantidad_necesaria in consumo_ingredientes.items():
+            ingrediente = session.get(Ingrediente, ing_id)
+            ingrediente.stock_cantidad -= cantidad_necesaria
+            session.add(ingrediente)
 
         # Historial inicial
         historial = HistorialEstadoPedido(

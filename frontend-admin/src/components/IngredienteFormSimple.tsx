@@ -20,6 +20,7 @@ export function IngredienteFormSimple({
       nombre: initialData?.nombre || '',
       descripcion: initialData?.descripcion || '',
       es_alergeno: initialData?.es_alergeno || false,
+      stock_cantidad: initialData?.stock_cantidad || 0,
     },
     onSubmit: async ({ value }) => {
       const validated = ingredienteFormSchema.parse(value);
@@ -49,7 +50,7 @@ export function IngredienteFormSimple({
               onBlur={field.handleBlur}
               placeholder="Ej: Pollo, Leche, Cacahuetes"
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                field.state.meta.errors.length > 0 ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                field.state.meta.errors.length > 0 ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-gray-500'
               }`}
             />
             {field.state.meta.errors.map((error, idx) => (
@@ -74,7 +75,32 @@ export function IngredienteFormSimple({
               onBlur={field.handleBlur}
               placeholder="Descripción del ingrediente"
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+            />
+            {field.state.meta.errors.map((error, idx) => (
+              <p key={idx} className="text-red-600 text-sm mt-1">
+                {error}
+              </p>
+            ))}
+          </div>
+        )}
+      </form.Field>
+
+      {/* Stock */}
+      <form.Field name="stock_cantidad">
+        {(field) => (
+          <div>
+            <label className="block text-gray-700 font-bold mb-2">Stock (unidades)</label>
+            <input
+              type="number"
+              min="0"
+              value={field.state.value}
+              onChange={(e) => field.handleChange(parseInt(e.target.value) || 0)}
+              onBlur={field.handleBlur}
+              placeholder="Ej: 100"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                field.state.meta.errors.length > 0 ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-gray-500'
+              }`}
             />
             {field.state.meta.errors.map((error, idx) => (
               <p key={idx} className="text-red-600 text-sm mt-1">
@@ -94,7 +120,7 @@ export function IngredienteFormSimple({
               checked={field.state.value}
               onChange={(e) => field.handleChange(e.target.checked)}
               onBlur={field.handleBlur}
-              className="rounded focus:ring-2 focus:ring-blue-500"
+              className="rounded focus:ring-2 focus:ring-gray-500"
             />
             <label className="ml-2 text-gray-700 font-bold">Marcar como alergeno</label>
           </div>
@@ -107,7 +133,7 @@ export function IngredienteFormSimple({
           type="submit"
           disabled={isLoading}
           className={`flex-1 font-bold py-2 px-4 rounded-lg transition-colors ${
-            isLoading ? 'bg-gray-400 text-gray-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'
+            isLoading ? 'bg-gray-400 text-gray-600 cursor-not-allowed' : 'bg-gray-800 hover:bg-gray-700 text-white'
           }`}
         >
           {isLoading ? 'Guardando...' : initialData ? 'Actualizar' : 'Crear'}

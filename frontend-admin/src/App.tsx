@@ -4,7 +4,6 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Admin pages
 import LoginPage from './pages/admin/LoginPage';
-import CajeroPage from './pages/admin/CajeroPage';
 
 // CRUD pages
 import CategoriasPage from './pages/CategoriasPage';
@@ -36,16 +35,6 @@ function AppRoutes() {
     <Routes>
       {/* Auth */}
       <Route path="/login" element={<LoginPage />} />
-
-      {/* Admin routes */}
-      <Route
-        path="/cajero"
-        element={
-          <ProtectedRoute roles={['ADMIN', 'PEDIDOS']}>
-            <CajeroPage />
-          </ProtectedRoute>
-        }
-      />
 
       {/* CRUD pages */}
       <Route
@@ -86,7 +75,7 @@ function AppRoutes() {
       <Route path="/404" element={<NotFoundPage />} />
 
       {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/cajero" replace />} />
+      <Route path="/" element={<Navigate to="/pedidos" replace />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );

@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 from datetime import datetime
 from sqlmodel import Session, select
 from app.core.repository import BaseRepository
-from app.producto.model import Producto
+from app.producto.model import Producto, ProductoIngredienteLink
 from app.categoria.model import Categoria
 from app.ingrediente.model import Ingrediente
 
@@ -31,22 +31,32 @@ class ProductoRepository(BaseRepository[Producto]):
             return None
         return producto
 
-    def create(self, producto: Producto, categoria_ids: List[int] = None, ingrediente_ids: List[int] = None) -> Producto:
+    def create(self, producto: Producto, categoria_ids: List[int] = None, ingredientes_data: list = None) -> Producto:
         if categoria_ids:
             for cat_id in categoria_ids:
                 categoria = self.session.get(Categoria, cat_id)
                 if categoria:
                     producto.categorias.append(categoria)
 
-        if ingrediente_ids:
-            for ing_id in ingrediente_ids:
-                ingrediente = self.session.get(Ingrediente, ing_id)
+        self.session.add(producto)
+        self.session.flush()
+
+        if ingredientes_data:
+            for ing_data in ingredientes_data:
+                ingrediente = self.session.get(Ingrediente, ing_data.ingrediente_id)
                 if ingrediente:
-                    producto.ingredientes.append(ingrediente)
+                    link = ProductoIngredienteLink(
+                        producto_id=producto.id,
+                        ingrediente_id=ing_data.ingrediente_id,
+                        cantidad=ing_data.cantidad,
+                        es_removible=ing_data.es_removible,
+                    )
+                    self.session.add(link)
 
-        return super().create(producto)
+        self.session.flush()
+        return producto
 
-    def update(self, db_producto: Producto, producto_data: dict, categoria_ids: List[int] = None, ingrediente_ids: List[int] = None) -> Producto:
+    def update(self, db_producto: Producto, producto_data: dict, categoria_ids: List[int] = None, ingredientes_data: list = None) -> Producto:
         if categoria_ids is not None:
             db_producto.categorias = []
             for cat_id in categoria_ids:
@@ -54,14 +64,37 @@ class ProductoRepository(BaseRepository[Producto]):
                 if categoria:
                     db_producto.categorias.append(categoria)
 
-        if ingrediente_ids is not None:
-            db_producto.ingredientes = []
-            for ing_id in ingrediente_ids:
-                ingrediente = self.session.get(Ingrediente, ing_id)
+        if ingredientes_data is not None:
+            # Borrar links existentes
+            existing_links = self.session.exec(
+                select(ProductoIngredienteLink).where(
+                    ProductoIngredienteLink.producto_id == db_producto.id
+                )
+            ).all()
+            for link in existing_links:
+                self.session.delete(link)
+            self.session.flush()
+
+            # Crear nuevos links con cantidad
+            for ing_data in ingredientes_data:
+                ingrediente = self.session.get(Ingrediente, ing_data.ingrediente_id)
                 if ingrediente:
-                    db_producto.ingredientes.append(ingrediente)
+                    link = ProductoIngredienteLink(
+                        producto_id=db_producto.id,
+                        ingrediente_id=ing_data.ingrediente_id,
+                        cantidad=ing_data.cantidad,
+                        es_removible=ing_data.es_removible,
+                    )
+                    self.session.add(link)
 
         return super().update(db_producto, producto_data)
+
+    def get_ingrediente_links(self, producto_id: int) -> List[ProductoIngredienteLink]:
+        """Obtiene los links producto-ingrediente con cantidad"""
+        statement = select(ProductoIngredienteLink).where(
+            ProductoIngredienteLink.producto_id == producto_id
+        )
+        return list(self.session.exec(statement).all())
 
     def delete(self, db_producto: Producto) -> None:
         """Soft delete a producto"""

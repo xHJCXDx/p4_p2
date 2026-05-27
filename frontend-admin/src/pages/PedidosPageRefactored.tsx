@@ -1,24 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Pedido } from '../types/pedido';
-import { PedidoFormSimple } from '../components/PedidoFormSimple';
 import { PedidoTable } from '../components/PedidoTable';
-import {
-  usePedidos,
-  useCreatePedido,
-  useUpdatePedido,
-  useDeletePedido,
-} from '../hooks/usePedidos';
+import { usePedidos, useTransitionEstado } from '../hooks/usePedidos';
 
 function PedidosPageRefactored() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { data: pedidos = [], isLoading } = usePedidos();
-  const createMutation = useCreatePedido();
-  const updateMutation = useUpdatePedido();
-  const deleteMutation = useDeletePedido();
+  const transitionMutation = useTransitionEstado();
 
   useEffect(() => {
     if (successMessage) {
@@ -27,46 +16,14 @@ function PedidosPageRefactored() {
     }
   }, [successMessage]);
 
-  const handleFormSubmit = async (data: Omit<Pedido, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
+  const handleChangeEstado = async (pedidoId: number, accion: string, motivo?: string) => {
     try {
-      if (selectedPedido && selectedPedido.id) {
-        await updateMutation.mutateAsync({
-          id: selectedPedido.id,
-          data,
-        });
-        setSuccessMessage('Pedido actualizado exitosamente');
-      } else {
-        await createMutation.mutateAsync(data);
-        setSuccessMessage('Pedido creado exitosamente');
-      }
-      setIsModalOpen(false);
-      setSelectedPedido(null);
+      await transitionMutation.mutateAsync({ pedido_id: pedidoId, accion });
+      setSuccessMessage(`Pedido #${pedidoId}: accion "${accion}" aplicada`);
     } catch (err) {
-      console.error('Error:', err);
-      setError(`Error al ${selectedPedido ? 'actualizar' : 'crear'} el pedido`);
+      console.error('Error en transicion:', err);
+      setError(`Error al cambiar estado del pedido #${pedidoId}`);
     }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este pedido?')) return;
-
-    try {
-      await deleteMutation.mutateAsync(id);
-      setSuccessMessage('Pedido eliminado exitosamente');
-    } catch (err) {
-      console.error('Error deleting:', err);
-      setError('Error al eliminar el pedido');
-    }
-  };
-
-  const openCreateModal = () => {
-    setSelectedPedido(null);
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = (pedido: Pedido) => {
-    setSelectedPedido(pedido);
-    setIsModalOpen(true);
   };
 
   return (
@@ -80,7 +37,6 @@ function PedidosPageRefactored() {
         </div>
       )}
 
-
       {successMessage && (
         <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex justify-between items-center">
           <span>{successMessage}</span>
@@ -90,48 +46,16 @@ function PedidosPageRefactored() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800">Pedidos</h2>
-        <button
-          onClick={openCreateModal}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-lg"
-        >
-          + Nuevo Pedido
-        </button>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-800">Gestion de Pedidos</h2>
+        <p className="text-gray-500 mt-1">Visualiza y gestiona el estado de los pedidos realizados</p>
       </div>
 
-      {/* Tabla */}
       <PedidoTable
         data={pedidos}
-        onEdit={openEditModal}
-        onDelete={handleDelete}
+        onChangeEstado={handleChangeEstado}
         isLoading={isLoading}
       />
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="bg-blue-600 text-white p-6">
-              <h3 className="text-xl font-bold">
-                {selectedPedido ? 'Editar Pedido' : 'Nuevo Pedido'}
-              </h3>
-            </div>
-            <div className="p-6">
-              <PedidoFormSimple
-                onSubmit={handleFormSubmit}
-                onCancel={() => {
-                  setIsModalOpen(false);
-                  setSelectedPedido(null);
-                }}
-                initialData={selectedPedido || undefined}
-                isLoading={createMutation.isPending || updateMutation.isPending}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

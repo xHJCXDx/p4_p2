@@ -10,9 +10,10 @@ from app.core.security import (
     verify_password,
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
-from app.usuario.schema import UsuarioCreate, UsuarioLogin
+from app.usuario.schema import UsuarioCreate, UsuarioLogin, UsuarioUpdate, PasswordChange
 from app.usuario.model import Usuario
 from app.usuario import service
+from app.core.security import hash_password
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Autenticación"])
 
@@ -77,6 +78,40 @@ def get_me(current_user: Usuario = Depends(get_current_user)) -> ApiResponse:
         data=service.usuario_to_read(current_user),
         message="Datos del usuario obtenidos"
     )
+
+
+@router.put("/me")
+def update_me(
+    update_data: UsuarioUpdate,
+    current_user: Usuario = Depends(get_current_user),
+    session: Session = Depends(get_session)
+) -> ApiResponse:
+    try:
+        updated_user = service.update_user(session, current_user, update_data)
+        return success_response(
+            data=service.usuario_to_read(updated_user),
+            message="Perfil actualizado exitosamente"
+        )
+    except ValueError as e:
+        return error_response(message=str(e), status_code=400)
+
+
+@router.put("/me/password")
+def change_password(
+    data: PasswordChange,
+    current_user: Usuario = Depends(get_current_user),
+    session: Session = Depends(get_session)
+) -> ApiResponse:
+    if not verify_password(data.current_password, current_user.password_hash):
+        return error_response(message="Contraseña actual incorrecta", status_code=400)
+
+    if len(data.new_password) < 6:
+        return error_response(message="La nueva contraseña debe tener al menos 6 caracteres", status_code=400)
+
+    current_user.password_hash = hash_password(data.new_password)
+    session.add(current_user)
+    session.commit()
+    return success_response(message="Contraseña actualizada exitosamente")
 
 
 @router.post("/logout")

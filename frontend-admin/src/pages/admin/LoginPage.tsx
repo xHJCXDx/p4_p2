@@ -26,7 +26,7 @@ export default function LoginPage() {
           const roles = user.roles || [];
           const hasAdminRole = roles.some((r: any) => ['ADMIN', 'PEDIDOS', 'STOCK'].includes(r.codigo));
           if (hasAdminRole) {
-            navigate('/cajero');
+            navigate('/pedidos');
           } else {
             // Si no es staff, no deberia estar en el admin
             setError('No tienes permisos de administracion');
@@ -40,7 +40,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-950 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-extrabold text-gray-900">Administracion</h1>
@@ -63,7 +63,7 @@ export default function LoginPage() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               placeholder="admin@admin.com"
               disabled={isPending}
             />
@@ -79,7 +79,7 @@ export default function LoginPage() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent pr-12"
                 placeholder="********"
                 disabled={isPending}
               />
@@ -96,7 +96,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gray-800 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? 'Iniciando sesion...' : 'Iniciar sesion'}
           </button>

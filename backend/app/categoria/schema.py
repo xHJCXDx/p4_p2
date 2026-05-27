@@ -8,6 +8,7 @@ class CategoriaCreate(CategoriaBase):
 class CategoriaRead(CategoriaBase):
     id: int
     parent_id: Optional[int] = None
+    parent_nombre: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None

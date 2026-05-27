@@ -1,14 +1,81 @@
 from typing import List, Optional, Tuple
 from datetime import datetime
-from sqlmodel import Session
-from app.producto.model import Producto
-from app.producto.schema import ProductoCreate, ProductoUpdate
+from sqlmodel import Session, select
+from app.producto.model import Producto, ProductoIngredienteLink
+from app.producto.schema import ProductoCreate, ProductoUpdate, ProductoRead, IngredienteInProducto, IngredienteEnReceta
 from app.producto.unit_of_work import ProductoUnitOfWork
+from app.ingrediente.model import Ingrediente
 
 
-def get_all(session: Session, limit: int = 100, offset: int = 0) -> Tuple[List[Producto], int]:
+def calcular_stock(session: Session, producto: Producto) -> Tuple[int, bool]:
+    """
+    Calcula el stock de un producto basado en los ingredientes disponibles.
+    stock = min(ingrediente.stock_cantidad // cantidad_necesaria) para cada ingrediente.
+    Si no tiene ingredientes, stock = 0 y no disponible.
+    """
+    links = session.exec(
+        select(ProductoIngredienteLink).where(
+            ProductoIngredienteLink.producto_id == producto.id
+        )
+    ).all()
+
+    if not links:
+        return 0, False
+
+    stock = float("inf")
+    for link in links:
+        ingrediente = session.get(Ingrediente, link.ingrediente_id)
+        if not ingrediente or ingrediente.deleted_at is not None:
+            return 0, False
+        unidades_posibles = ingrediente.stock_cantidad // link.cantidad
+        stock = min(stock, unidades_posibles)
+
+    stock = int(stock) if stock != float("inf") else 0
+    return stock, stock > 0
+
+
+def build_producto_read(session: Session, producto: Producto) -> ProductoRead:
+    """Construye un ProductoRead con stock calculado e ingredientes con cantidad."""
+    stock_cantidad, disponible = calcular_stock(session, producto)
+
+    links = session.exec(
+        select(ProductoIngredienteLink).where(
+            ProductoIngredienteLink.producto_id == producto.id
+        )
+    ).all()
+
+    ingredientes_read = []
+    for link in links:
+        ingrediente = session.get(Ingrediente, link.ingrediente_id)
+        if ingrediente and ingrediente.deleted_at is None:
+            ingredientes_read.append(IngredienteInProducto(
+                id=ingrediente.id,
+                nombre=ingrediente.nombre,
+                es_alergeno=ingrediente.es_alergeno,
+                cantidad=link.cantidad,
+                es_removible=link.es_removible,
+            ))
+
+    return ProductoRead(
+        id=producto.id,
+        nombre=producto.nombre,
+        descripcion=producto.descripcion,
+        precio_base=producto.precio_base,
+        imagenes_url=producto.imagenes_url,
+        created_at=producto.created_at,
+        updated_at=producto.updated_at,
+        deleted_at=producto.deleted_at,
+        categorias=producto.categorias,
+        ingredientes=ingredientes_read,
+        stock_cantidad=stock_cantidad,
+        disponible=disponible,
+    )
+
+
+def get_all(session: Session, limit: int = 100, offset: int = 0) -> Tuple[List[ProductoRead], int]:
     with ProductoUnitOfWork(session) as uow:
-        return uow.productos.get_all(limit, offset)
+        productos, total = uow.productos.get_all(limit, offset)
+        return [build_producto_read(session, p) for p in productos], total
 
 
 def get_by_id(session: Session, producto_id: int) -> Optional[Producto]:
@@ -18,8 +85,10 @@ def get_by_id(session: Session, producto_id: int) -> Optional[Producto]:
 
 def create(session: Session, producto_data: ProductoCreate) -> Producto:
     with ProductoUnitOfWork(session) as uow:
-        db_producto = Producto.model_validate(producto_data)
-        producto = uow.productos.create(db_producto, producto_data.categoria_ids, producto_data.ingrediente_ids)
+        ingredientes_data = producto_data.ingredientes
+        producto_dict = producto_data.model_dump(exclude={"categoria_ids", "ingredientes"})
+        db_producto = Producto(**producto_dict)
+        producto = uow.productos.create(db_producto, producto_data.categoria_ids, ingredientes_data)
     session.refresh(producto)
     return producto
 
@@ -29,11 +98,19 @@ def update(session: Session, db_producto: Producto, producto_data: ProductoUpdat
         producto_dict = producto_data.model_dump(exclude_unset=True)
 
         categoria_ids = producto_dict.pop("categoria_ids", None)
-        ingrediente_ids = producto_dict.pop("ingrediente_ids", None)
+        ingredientes_raw = producto_dict.pop("ingredientes", None)
+
+        # Convertir dicts a objetos IngredienteEnReceta si vienen desde model_dump
+        ingredientes_data = None
+        if ingredientes_raw is not None:
+            ingredientes_data = [
+                IngredienteEnReceta(**ing) if isinstance(ing, dict) else ing
+                for ing in ingredientes_raw
+            ]
 
         producto_dict["updated_at"] = datetime.utcnow()
 
-        updated = uow.productos.update(db_producto, producto_dict, categoria_ids, ingrediente_ids)
+        updated = uow.productos.update(db_producto, producto_dict, categoria_ids, ingredientes_data)
     session.refresh(updated)
     return updated
 

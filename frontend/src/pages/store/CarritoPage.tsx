@@ -14,7 +14,7 @@ export default function CarritoPage() {
           <p className="text-gray-500 text-lg mb-6">El carrito está vacío</p>
           <Link
             to="/store/home"
-            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-block bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
           >
             Continuar comprando
           </Link>
@@ -97,7 +97,7 @@ export default function CarritoPage() {
 
             <Link
               to="/store/checkout"
-              className="block w-full bg-blue-600 text-white text-center px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium mb-3"
+              className="block w-full bg-gray-800 text-white text-center px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium mb-3"
             >
               Proceder al checkout
             </Link>

@@ -71,7 +71,7 @@ export function PedidoFormSimple({
           value={formData.usuario_id}
           onChange={(e) => handleNumberChange('usuario_id', e.target.value)}
           className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-            errors.usuario_id ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+            errors.usuario_id ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-gray-500'
           }`}
         />
         {errors.usuario_id && <p className="text-red-600 text-sm mt-1">{errors.usuario_id}</p>}
@@ -86,7 +86,7 @@ export function PedidoFormSimple({
           value={formData.subtotal}
           onChange={(e) => handleNumberChange('subtotal', e.target.value)}
           className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-            errors.subtotal ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+            errors.subtotal ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-gray-500'
           }`}
         />
         {errors.subtotal && <p className="text-red-600 text-sm mt-1">{errors.subtotal}</p>}
@@ -100,7 +100,7 @@ export function PedidoFormSimple({
           step="0.01"
           value={formData.descuento}
           onChange={(e) => handleNumberChange('descuento', e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
         />
       </div>
 
@@ -112,7 +112,7 @@ export function PedidoFormSimple({
           step="0.01"
           value={formData.costo_envio}
           onChange={(e) => handleNumberChange('costo_envio', e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
         />
       </div>
 
@@ -125,7 +125,7 @@ export function PedidoFormSimple({
           value={formData.total}
           onChange={(e) => handleNumberChange('total', e.target.value)}
           className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-            errors.total ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+            errors.total ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-gray-500'
           }`}
         />
         {errors.total && <p className="text-red-600 text-sm mt-1">{errors.total}</p>}
@@ -139,7 +139,7 @@ export function PedidoFormSimple({
           onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
           rows={2}
           placeholder="Notas adicionales..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
         />
       </div>
 
@@ -149,7 +149,7 @@ export function PedidoFormSimple({
           type="submit"
           disabled={isLoading}
           className={`flex-1 font-bold py-2 px-4 rounded-lg transition-colors ${
-            isLoading ? 'bg-gray-400 text-gray-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'
+            isLoading ? 'bg-gray-400 text-gray-600 cursor-not-allowed' : 'bg-gray-800 hover:bg-gray-700 text-white'
           }`}
         >
           {isLoading ? 'Guardando...' : initialData ? 'Actualizar' : 'Crear'}

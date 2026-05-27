@@ -8,6 +8,7 @@ import ProductoDetailPage from './pages/store/ProductoDetailPage';
 import CarritoPage from './pages/store/CarritoPage';
 import CheckoutPage from './pages/store/CheckoutPage';
 import MisPedidosPage from './pages/store/MisPedidosPage';
+import ConfiguracionPage from './pages/store/ConfiguracionPage';
 
 // Auth
 import LoginPage from './pages/store/LoginPage';
@@ -54,6 +55,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute roles={['CLIENT']}>
             <MisPedidosPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/store/configuracion"
+        element={
+          <ProtectedRoute roles={['CLIENT']}>
+            <ConfiguracionPage />
           </ProtectedRoute>
         }
       />

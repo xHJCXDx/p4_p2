@@ -50,7 +50,7 @@ export default function CajeroPage() {
       case 'PENDIENTE':
         return 'bg-yellow-100 text-yellow-800';
       case 'CONFIRMADO':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-gray-200 text-gray-800';
       case 'EN_PREP':
         return 'bg-purple-100 text-purple-800';
       case 'EN_CAMINO':
@@ -154,7 +154,7 @@ export default function CajeroPage() {
                       <button
                         key={accion}
                         onClick={() => handleTransition(pedido.id, accion)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors font-medium"
                       >
                         {getAccionBoton(accion)}
                       </button>

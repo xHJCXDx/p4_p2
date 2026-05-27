@@ -42,10 +42,20 @@ export function IngredienteTable({ data, onEdit, onDelete, isLoading = false }: 
         cell: (info) => info.getValue() || '-',
         enableSorting: false,
       }),
+      columnHelper.accessor('stock_cantidad', {
+        header: 'Stock',
+        cell: (info) => (
+          <span className={info.getValue() > 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+            {info.getValue()}
+          </span>
+        ),
+        enableSorting: true,
+        size: 80,
+      }),
       columnHelper.accessor('es_alergeno', {
         header: 'Alergeno',
         cell: (info) => (
-          <span className={info.getValue() ? 'text-red-600 font-bold' : 'text-green-600'}>
+          <span className={info.getValue() ? 'text-yellow-600 font-bold' : 'text-green-600'}>
             {info.getValue() ? '⚠️ Sí' : '✓ No'}
           </span>
         ),
@@ -101,7 +111,7 @@ export function IngredienteTable({ data, onEdit, onDelete, isLoading = false }: 
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder="Buscar por nombre..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
         />
       </div>
 
@@ -186,7 +196,7 @@ export function IngredienteTable({ data, onEdit, onDelete, isLoading = false }: 
                 onClick={() => table.setPageIndex(page)}
                 className={`px-3 py-2 rounded-lg ${
                   table.getState().pagination.pageIndex === page
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-gray-800 text-white'
                     : 'border border-gray-300 hover:bg-gray-100'
                 }`}
               >

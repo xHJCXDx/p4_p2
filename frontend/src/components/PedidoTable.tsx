@@ -23,7 +23,7 @@ const columnHelper = createColumnHelper<Pedido>();
 const getEstadoBadgeColor = (estado: string) => {
   const colors: Record<string, string> = {
     'PENDIENTE': 'bg-yellow-100 text-yellow-800',
-    'CONFIRMADO': 'bg-blue-100 text-blue-800',
+    'CONFIRMADO': 'bg-gray-200 text-gray-800',
     'EN_PREP': 'bg-purple-100 text-purple-800',
     'EN_CAMINO': 'bg-orange-100 text-orange-800',
     'ENTREGADO': 'bg-green-100 text-green-800',
@@ -127,7 +127,7 @@ export function PedidoTable({ data, onEdit, onDelete, isLoading = false }: Pedid
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder="Buscar por usuario o estado..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
         />
       </div>
 
@@ -212,7 +212,7 @@ export function PedidoTable({ data, onEdit, onDelete, isLoading = false }: Pedid
                 onClick={() => table.setPageIndex(page)}
                 className={`px-3 py-2 rounded-lg ${
                   table.getState().pagination.pageIndex === page
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-gray-800 text-white'
                     : 'border border-gray-300 hover:bg-gray-100'
                 }`}
               >

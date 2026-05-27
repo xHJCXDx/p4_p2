@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { Producto } from '../types/producto';
+import { Producto, IngredienteEnReceta } from '../types/producto';
 import { productoFormSchema } from '../schemas/producto.schema';
 import { useCategorias } from '../hooks/useCategorias';
 import { useIngredientes } from '../hooks/useIngredientes';
@@ -12,16 +12,26 @@ interface Props {
   productoInitial?: Producto | null;
 }
 
-function getDefaults(p?: Producto | null) {
+function getDefaults(p?: Producto | null): {
+  nombre: string;
+  descripcion: string;
+  precio_base: number;
+  imagen_url: string;
+  categoria_ids: number[];
+  ingredientes: IngredienteEnReceta[];
+} {
   return {
     nombre: p?.nombre || '',
     descripcion: p?.descripcion || '',
     precio_base: p?.precio_base || 0,
     imagen_url: p?.imagen_url || '',
-    stock_cantidad: p?.stock_cantidad || 0,
-    disponible: p?.disponible ?? true,
     categoria_ids: p?.categorias?.map((c) => c.id) || [],
-    ingrediente_ids: p?.ingredientes?.map((i) => i.id) || [],
+    ingredientes:
+      p?.ingredientes?.map((i) => ({
+        ingrediente_id: i.id,
+        cantidad: i.cantidad,
+        es_removible: i.es_removible,
+      })) || [],
   };
 }
 
@@ -47,11 +57,14 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, productoInitial }: Props) =>
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6">
-          {productoInitial ? 'Editar Producto' : 'Nuevo Producto'}
-        </h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full lg:w-[80vw] lg:max-w-[80vw] max-h-[90vh] overflow-y-auto">
+        <div className="bg-gray-800 text-white p-6 rounded-t-lg">
+          <h3 className="text-xl font-bold">
+            {productoInitial ? 'Editar Producto' : 'Nuevo Producto'}
+          </h3>
+        </div>
+        <div className="p-6">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -79,7 +92,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, productoInitial }: Props) =>
           <form.Field name="descripcion">
             {(field) => (
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Descripcion</label>
                 <textarea
                   rows={3}
                   value={field.state.value}
@@ -94,46 +107,25 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, productoInitial }: Props) =>
             )}
           </form.Field>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <form.Field name="precio_base">
-              {(field) => (
-                <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2">Precio Base</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(parseFloat(e.target.value) || 0)}
-                    onBlur={field.handleBlur}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  />
-                  {field.state.meta.errors.map((error, idx) => (
-                    <p key={idx} className="text-red-500 text-xs mt-1">{error}</p>
-                  ))}
-                </div>
-              )}
-            </form.Field>
-
-            <form.Field name="stock_cantidad">
-              {(field) => (
-                <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2">Stock</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(parseInt(e.target.value) || 0)}
-                    onBlur={field.handleBlur}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  />
-                  {field.state.meta.errors.map((error, idx) => (
-                    <p key={idx} className="text-red-500 text-xs mt-1">{error}</p>
-                  ))}
-                </div>
-              )}
-            </form.Field>
-          </div>
+          <form.Field name="precio_base">
+            {(field) => (
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Precio Base</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(parseFloat(e.target.value) || 0)}
+                  onBlur={field.handleBlur}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+                {field.state.meta.errors.map((error, idx) => (
+                  <p key={idx} className="text-red-500 text-xs mt-1">{error}</p>
+                ))}
+              </div>
+            )}
+          </form.Field>
 
           <form.Field name="imagen_url">
             {(field) => (
@@ -150,29 +142,13 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, productoInitial }: Props) =>
             )}
           </form.Field>
 
-          <form.Field name="disponible">
-            {(field) => (
-              <div className="mb-4">
-                <label className="flex items-center text-gray-700 text-sm font-bold">
-                  <input
-                    type="checkbox"
-                    checked={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.checked)}
-                    className="mr-2"
-                  />
-                  Disponible
-                </label>
-              </div>
-            )}
-          </form.Field>
-
           <form.Field name="categoria_ids">
             {(field) => (
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Categorías</label>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Categorias</label>
                 <div className="border rounded p-3 max-h-40 overflow-y-auto bg-gray-50">
                   {categorias.length === 0 ? (
-                    <p className="text-gray-400 text-sm">No hay categorías disponibles</p>
+                    <p className="text-gray-400 text-sm">No hay categorias disponibles</p>
                   ) : (
                     categorias.map((cat) => (
                       <label key={cat.id} className="flex items-center mb-1 text-sm">
@@ -198,41 +174,133 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, productoInitial }: Props) =>
             )}
           </form.Field>
 
-          <form.Field name="ingrediente_ids">
-            {(field) => (
-              <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Ingredientes</label>
-                <div className="border rounded p-3 max-h-40 overflow-y-auto bg-gray-50">
-                  {ingredientes.length === 0 ? (
-                    <p className="text-gray-400 text-sm">No hay ingredientes disponibles</p>
-                  ) : (
-                    ingredientes.map((ing) => (
-                      <label key={ing.id} className="flex items-center mb-1 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={field.state.value.includes(ing.id!)}
-                          onChange={(e) => {
-                            const current = field.state.value;
-                            if (e.target.checked) {
-                              field.handleChange([...current, ing.id!]);
-                            } else {
-                              field.handleChange(current.filter((id) => id !== ing.id));
-                            }
-                          }}
-                          className="mr-2"
-                        />
-                        {ing.nombre}
-                        {ing.es_alergeno && (
-                          <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
-                            Alérgeno
-                          </span>
-                        )}
-                      </label>
-                    ))
+          {/* Ingredientes con cantidad (receta) */}
+          <form.Field name="ingredientes">
+            {(field) => {
+              const receta = field.state.value;
+
+              const addIngrediente = (ingId: number) => {
+                if (receta.some((r) => r.ingrediente_id === ingId)) return;
+                field.handleChange([
+                  ...receta,
+                  { ingrediente_id: ingId, cantidad: 1, es_removible: false },
+                ]);
+              };
+
+              const removeIngrediente = (ingId: number) => {
+                field.handleChange(receta.filter((r) => r.ingrediente_id !== ingId));
+              };
+
+              const updateCantidad = (ingId: number, cantidad: number) => {
+                field.handleChange(
+                  receta.map((r) =>
+                    r.ingrediente_id === ingId ? { ...r, cantidad: Math.max(1, cantidad) } : r
+                  )
+                );
+              };
+
+              const toggleRemovible = (ingId: number) => {
+                field.handleChange(
+                  receta.map((r) =>
+                    r.ingrediente_id === ingId ? { ...r, es_removible: !r.es_removible } : r
+                  )
+                );
+              };
+
+              const ingredientesDisponibles = ingredientes.filter(
+                (ing) => !receta.some((r) => r.ingrediente_id === ing.id)
+              );
+
+              return (
+                <div className="mb-6">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Receta (ingredientes)
+                  </label>
+
+                  {/* Lista de ingredientes en la receta */}
+                  {receta.length > 0 && (
+                    <div className="space-y-2 mb-3">
+                      {receta.map((item) => {
+                        const ing = ingredientes.find((i) => i.id === item.ingrediente_id);
+                        if (!ing) return null;
+                        return (
+                          <div
+                            key={item.ingrediente_id}
+                            className="flex items-center gap-2 bg-gray-50 border rounded p-2"
+                          >
+                            <span className="flex-1 text-sm font-medium">
+                              {ing.nombre}
+                              {ing.es_alergeno && (
+                                <span className="ml-1 text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded-full">
+                                  Alergeno
+                                </span>
+                              )}
+                              <span className="ml-1 text-xs text-gray-400">
+                                (stock: {ing.stock_cantidad})
+                              </span>
+                            </span>
+                            <input
+                              type="number"
+                              min="1"
+                              value={item.cantidad}
+                              onChange={(e) =>
+                                updateCantidad(item.ingrediente_id, parseInt(e.target.value) || 1)
+                              }
+                              className="w-16 text-center border rounded py-1 px-2 text-sm"
+                              title="Cantidad necesaria"
+                            />
+                            <label className="flex items-center text-xs gap-1" title="Removible por el cliente">
+                              <input
+                                type="checkbox"
+                                checked={item.es_removible}
+                                onChange={() => toggleRemovible(item.ingrediente_id)}
+                              />
+                              Removible
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => removeIngrediente(item.ingrediente_id)}
+                              className="text-red-500 hover:text-red-700 text-sm font-bold px-1"
+                              title="Quitar ingrediente"
+                            >
+                              X
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Selector para agregar ingredientes */}
+                  {ingredientesDisponibles.length > 0 && (
+                    <select
+                      onChange={(e) => {
+                        const id = parseInt(e.target.value);
+                        if (id) addIngrediente(id);
+                        e.target.value = '';
+                      }}
+                      defaultValue=""
+                      className="w-full border rounded py-2 px-3 text-sm text-gray-700 bg-white"
+                    >
+                      <option value="" disabled>
+                        + Agregar ingrediente...
+                      </option>
+                      {ingredientesDisponibles.map((ing) => (
+                        <option key={ing.id} value={ing.id}>
+                          {ing.nombre} {ing.es_alergeno ? '(alergeno)' : ''} — stock: {ing.stock_cantidad}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
+                  {receta.length === 0 && (
+                    <p className="text-gray-400 text-xs mt-1">
+                      Sin ingredientes. El producto no tendra stock calculado.
+                    </p>
                   )}
                 </div>
-              </div>
-            )}
+              );
+            }}
           </form.Field>
 
           <div className="flex justify-end space-x-3">
@@ -245,12 +313,13 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, productoInitial }: Props) =>
             </button>
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors"
+              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors"
             >
               Guardar
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

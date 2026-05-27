@@ -97,7 +97,7 @@ export default function ProductoDetailPage() {
                     key={i.id}
                     className={`text-sm px-3 py-1 rounded-full ${
                       i.es_alergeno
-                        ? 'bg-red-100 text-red-700'
+                        ? 'bg-yellow-100 text-yellow-800'
                         : 'bg-green-100 text-green-700'
                     }`}
                   >
@@ -111,7 +111,7 @@ export default function ProductoDetailPage() {
           <button
             onClick={handleAddToCart}
             disabled={!producto.disponible || producto.stock_cantidad === 0}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {producto.disponible && producto.stock_cantidad > 0
               ? 'Agregar al carrito'
