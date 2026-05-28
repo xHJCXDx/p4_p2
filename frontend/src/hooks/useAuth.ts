@@ -9,6 +9,7 @@ export interface LoginCredentials {
 
 export interface RegisterCredentials {
   nombre: string;
+  apellido: string;
   email: string;
   password: string;
 }
@@ -44,7 +45,6 @@ export function useRegister() {
 export interface ProfileUpdate {
   nombre?: string;
   apellido?: string;
-  email?: string;
   celular?: string | null;
 }
 

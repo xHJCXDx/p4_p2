@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -41,18 +42,19 @@ export default function LoginPage() {
     setError('');
     setSuccess('');
 
-    if (!nombre || !email || !password) {
+    if (!nombre || !apellido || !email || !password) {
       setError('Todos los campos son requeridos');
       return;
     }
 
     register(
-      { nombre, email, password },
+      { nombre, apellido, email, password },
       {
         onSuccess: () => {
           setSuccess('Cuenta creada exitosamente. Ahora podes iniciar sesion.');
           setIsRegisterMode(false);
           setNombre('');
+          setApellido('');
           setPassword('');
         },
         onError: (err: any) => {
@@ -87,20 +89,36 @@ export default function LoginPage() {
           )}
 
           {isRegisterMode && (
-            <div>
-              <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
-                Nombre
-              </label>
-              <input
-                type="text"
-                id="nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                placeholder="Tu nombre"
-                disabled={registerPending}
-              />
-            </div>
+            <>
+              <div>
+                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  id="nombre"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  placeholder="Tu nombre"
+                  disabled={registerPending}
+                />
+              </div>
+              <div>
+                <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-1">
+                  Apellido
+                </label>
+                <input
+                  type="text"
+                  id="apellido"
+                  value={apellido}
+                  onChange={(e) => setApellido(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  placeholder="Tu apellido"
+                  disabled={registerPending}
+                />
+              </div>
+            </>
           )}
 
           <div>
