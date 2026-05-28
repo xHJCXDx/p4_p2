@@ -52,7 +52,6 @@ function PerfilSection() {
   const { mutate: updateProfile, isPending } = useUpdateProfile();
   const [nombre, setNombre] = useState(usuario?.nombre || '');
   const [apellido, setApellido] = useState(usuario?.apellido || '');
-  const [email, setEmail] = useState(usuario?.email || '');
   const [celular, setCelular] = useState(usuario?.celular || '');
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
@@ -63,7 +62,7 @@ function PerfilSection() {
     setError('');
 
     updateProfile(
-      { nombre, apellido, email, celular: celular || null },
+      { nombre, apellido, celular: celular || null },
       {
         onSuccess: () => setMsg('Perfil actualizado correctamente'),
         onError: (err: any) =>
@@ -111,10 +110,9 @@ function PerfilSection() {
         <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
         <input
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-          required
+          value={usuario?.email || ''}
+          disabled
+          className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
         />
       </div>
 

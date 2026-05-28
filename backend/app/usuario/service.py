@@ -73,19 +73,12 @@ def get_user_by_id(session: Session, user_id: int) -> Optional[Usuario]:
 
 
 def update_user(session: Session, user: Usuario, update_data: UsuarioUpdate) -> Usuario:
-    """Actualiza datos del usuario (nombre, email)."""
+    """Actualiza datos del usuario (nombre, apellido, celular)."""
     with UsuarioUnitOfWork(session) as uow:
-        if update_data.email and update_data.email != user.email:
-            existing = uow.usuarios.get_by_email(update_data.email)
-            if existing:
-                raise ValueError(f"El email {update_data.email} ya está en uso")
-
         if update_data.nombre:
             user.nombre = update_data.nombre
         if update_data.apellido is not None:
             user.apellido = update_data.apellido
-        if update_data.email:
-            user.email = update_data.email
         if update_data.celular is not None:
             user.celular = update_data.celular
 

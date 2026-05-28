@@ -41,7 +41,6 @@ class UsuarioUpdate(BaseModel):
     """Schema para actualizar usuario."""
     nombre: Optional[str] = None
     apellido: Optional[str] = None
-    email: Optional[EmailStr] = None
     celular: Optional[str] = None
 
 
