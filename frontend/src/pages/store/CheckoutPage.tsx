@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDirecciones } from '../../hooks/useDirecciones';
 import { useCreatePedido } from '../../hooks/usePedidos';
@@ -10,10 +10,15 @@ export default function CheckoutPage() {
   const { data: direcciones = [] } = useDirecciones();
   const { mutate: crearPedido, isPending } = useCreatePedido();
 
-  const [selectedDireccionId, setSelectedDireccionId] = useState<number | null>(
-    direcciones.find((d: any) => d.es_principal)?.id || (direcciones.length > 0 ? direcciones[0].id : null)
-  );
+  const [selectedDireccionId, setSelectedDireccionId] = useState<number | null>(null);
   const [formaPago, setFormaPago] = useState('EFECTIVO');
+
+  useEffect(() => {
+    if (direcciones.length > 0 && selectedDireccionId === null) {
+      const principal = direcciones.find((d: any) => d.es_principal);
+      setSelectedDireccionId(principal?.id ?? direcciones[0].id);
+    }
+  }, [direcciones, selectedDireccionId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
