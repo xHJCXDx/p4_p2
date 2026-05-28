@@ -1,6 +1,7 @@
 """Schemas para DireccionEntrega."""
 
 from typing import Optional
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -17,6 +18,8 @@ class DireccionCreate(BaseModel):
 
 
 class DireccionRead(BaseModel):
+    model_config = {"from_attributes": True}
+
     id: int
     usuario_id: int
     alias: str
@@ -28,7 +31,7 @@ class DireccionRead(BaseModel):
     latitud: Optional[float] = None
     longitud: Optional[float] = None
     es_principal: bool
-    created_at: str
+    created_at: datetime
 
 
 class DireccionUpdate(BaseModel):
