@@ -8,6 +8,8 @@ import {
   useUpdateCategoria,
   useDeleteCategoria,
 } from '../hooks/useCategorias';
+import { useConfirm } from '../components/ConfirmDialog';
+import { useToast } from '../components/Toast';
 
 function CategoriasPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,13 +46,18 @@ function CategoriasPage() {
     }
   };
 
+  const confirm = useConfirm();
+  const { showToast } = useToast();
+
   const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta categoría?')) return;
+    const ok = await confirm({ message: '¿Estas seguro de eliminar esta categoria?' });
+    if (!ok) return;
     try {
       await deleteMutation.mutateAsync(id);
+      showToast('Categoria eliminada', 'success');
     } catch (err) {
       console.error('Error deleting categoria:', err);
-      setError('Error al eliminar la categoría');
+      showToast('Error al eliminar la categoria', 'error');
     }
   };
 

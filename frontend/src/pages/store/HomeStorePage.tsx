@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCategorias } from '../../hooks/useCategorias';
 import { useProductos } from '../../hooks/useProductos';
 import { useCarritoStore } from '../../store/useCarritoStore';
+import { useToast } from '../../components/Toast';
 
 export default function HomeStorePage() {
   const [selectedCategoriaId, setSelectedCategoriaId] = useState<number | undefined>(undefined);
@@ -15,6 +16,7 @@ export default function HomeStorePage() {
   });
 
   const addItem = useCarritoStore((state) => state.addItem);
+  const { showToast } = useToast();
 
   const handleAddToCarrito = (producto: any) => {
     addItem({
@@ -24,7 +26,7 @@ export default function HomeStorePage() {
       cantidad: 1,
       imagen: producto.imagen_url,
     });
-    alert(`${producto.nombre} agregado al carrito`);
+    showToast(`${producto.nombre} agregado al carrito`, 'success');
   };
 
   return (

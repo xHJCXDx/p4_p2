@@ -1,7 +1,23 @@
 from typing import List, Optional, Tuple
 from sqlmodel import Session, select
 from app.core.repository import BaseRepository
-from app.catalogo.model import FormaPago, EstadoPedido
+from app.catalogo.model import FormaPago, EstadoPedido, UnidadMedida
+
+
+class UnidadMedidaRepository(BaseRepository[UnidadMedida]):
+
+    def __init__(self, session: Session):
+        super().__init__(session, UnidadMedida)
+
+    def get_all_simple(self) -> List[UnidadMedida]:
+        statement = select(self.model)
+        return list(self.session.exec(statement).all())
+
+    def get_by_id(self, codigo: str) -> Optional[UnidadMedida]:
+        return self.session.get(UnidadMedida, codigo)
+
+    def flush(self) -> None:
+        self.session.flush()
 
 
 class FormaPagoRepository(BaseRepository[FormaPago]):

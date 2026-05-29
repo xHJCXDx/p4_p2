@@ -46,11 +46,11 @@ export function IngredienteTable({ data, onEdit, onDelete, isLoading = false }: 
         header: 'Stock',
         cell: (info) => (
           <span className={info.getValue() > 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
-            {info.getValue()}
+            {info.getValue()} {info.row.original.unidad_medida_codigo}
           </span>
         ),
         enableSorting: true,
-        size: 80,
+        size: 120,
       }),
       columnHelper.accessor('es_alergeno', {
         header: 'Alergeno',

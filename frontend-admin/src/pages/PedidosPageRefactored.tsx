@@ -16,7 +16,7 @@ function PedidosPageRefactored() {
     }
   }, [successMessage]);
 
-  const handleChangeEstado = async (pedidoId: number, accion: string, motivo?: string) => {
+  const handleChangeEstado = async (pedidoId: number, accion: string, _motivo?: string) => {
     try {
       await transitionMutation.mutateAsync({ pedido_id: pedidoId, accion });
       setSuccessMessage(`Pedido #${pedidoId}: accion "${accion}" aplicada`);

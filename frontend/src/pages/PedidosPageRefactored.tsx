@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Pedido } from '../types/pedido';
 import { PedidoFormSimple } from '../components/PedidoFormSimple';
 import { PedidoTable } from '../components/PedidoTable';
@@ -8,6 +8,8 @@ import {
   useUpdatePedido,
   useDeletePedido,
 } from '../hooks/usePedidos';
+import { useConfirm } from '../components/ConfirmDialog';
+import { useToast } from '../components/Toast';
 
 function PedidosPageRefactored() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,13 +21,8 @@ function PedidosPageRefactored() {
   const createMutation = useCreatePedido();
   const updateMutation = useUpdatePedido();
   const deleteMutation = useDeletePedido();
-
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage]);
+  const confirmDialog = useConfirm();
+  const { showToast } = useToast();
 
   const handleFormSubmit = async (data: Omit<Pedido, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
     try {
@@ -34,28 +31,29 @@ function PedidosPageRefactored() {
           id: selectedPedido.id,
           data,
         });
-        setSuccessMessage('Pedido actualizado exitosamente');
+        showToast('Pedido actualizado', 'success');
       } else {
         await createMutation.mutateAsync(data);
-        setSuccessMessage('Pedido creado exitosamente');
+        showToast('Pedido creado', 'success');
       }
       setIsModalOpen(false);
       setSelectedPedido(null);
     } catch (err) {
       console.error('Error:', err);
-      setError(`Error al ${selectedPedido ? 'actualizar' : 'crear'} el pedido`);
+      showToast(`Error al ${selectedPedido ? 'actualizar' : 'crear'} el pedido`, 'error');
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este pedido?')) return;
+    const ok = await confirmDialog({ message: '¿Estas seguro de eliminar este pedido?' });
+    if (!ok) return;
 
     try {
       await deleteMutation.mutateAsync(id);
-      setSuccessMessage('Pedido eliminado exitosamente');
+      showToast('Pedido eliminado', 'success');
     } catch (err) {
       console.error('Error deleting:', err);
-      setError('Error al eliminar el pedido');
+      showToast('Error al eliminar el pedido', 'error');
     }
   };
 

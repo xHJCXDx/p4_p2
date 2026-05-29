@@ -24,11 +24,15 @@ export default function LoginPage() {
       {
         onSuccess: (user: any) => {
           const roles = user.roles || [];
-          const hasAdminRole = roles.some((r: any) => ['ADMIN', 'PEDIDOS', 'STOCK'].includes(r.codigo));
-          if (hasAdminRole) {
+          const isAdmin = roles.some((r: any) => r.codigo === 'ADMIN');
+          const isPedidos = roles.some((r: any) => r.codigo === 'PEDIDOS');
+          const isStock = roles.some((r: any) => r.codigo === 'STOCK');
+
+          if (isAdmin || isPedidos) {
             navigate('/pedidos');
+          } else if (isStock) {
+            navigate('/productos');
           } else {
-            // Si no es staff, no deberia estar en el admin
             setError('No tienes permisos de administracion');
           }
         },

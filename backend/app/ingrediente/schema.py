@@ -15,3 +15,4 @@ class IngredienteUpdate(IngredienteBase):
     descripcion: Optional[str] = None
     es_alergeno: Optional[bool] = None
     stock_cantidad: Optional[int] = None
+    unidad_medida_codigo: Optional[str] = None

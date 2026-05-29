@@ -1,5 +1,19 @@
 """Catálogos y constantes globales del sistema."""
 
+# Unidades de Medida (Seed obligatorio)
+UNIDADES_MEDIDA = [
+    {"codigo": "kg", "nombre": "Kilogramos"},
+    {"codigo": "g", "nombre": "Gramos"},
+    {"codigo": "l", "nombre": "Litros"},
+    {"codigo": "ml", "nombre": "Mililitros"},
+    {"codigo": "u", "nombre": "Unidades"},
+    {"codigo": "oz", "nombre": "Onzas"},
+    {"codigo": "lb", "nombre": "Libras"},
+    {"codigo": "taza", "nombre": "Tazas"},
+    {"codigo": "cda", "nombre": "Cucharadas"},
+    {"codigo": "cdta", "nombre": "Cucharaditas"},
+]
+
 # Formas de Pago (Seed obligatorio)
 FORMAS_PAGO = [
     {"codigo": "MERCADOPAGO", "descripcion": "Checkout MercadoPago", "habilitado": True},

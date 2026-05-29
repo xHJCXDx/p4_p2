@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProducto } from '../../hooks/useProductos';
 import { useCarritoStore } from '../../store/useCarritoStore';
+import { useToast } from '../../components/Toast';
 
 export default function ProductoDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +34,8 @@ export default function ProductoDetailPage() {
     );
   }
 
+  const { showToast } = useToast();
+
   const handleAddToCart = () => {
     addItem({
       producto_id: producto.id,
@@ -40,7 +43,7 @@ export default function ProductoDetailPage() {
       precio: producto.precio_base,
       cantidad: 1,
     });
-    alert('Producto agregado al carrito');
+    showToast('Producto agregado al carrito', 'success');
   };
 
   return (

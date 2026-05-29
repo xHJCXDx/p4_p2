@@ -8,6 +8,7 @@ class IngredienteBase(SQLModel):
     descripcion: Optional[str] = None
     es_alergeno: bool = Field(default=False)
     stock_cantidad: int = Field(default=0, ge=0)
+    unidad_medida_codigo: str = Field(default="u", foreign_key="unidadmedida.codigo", max_length=10)
 
 class Ingrediente(IngredienteBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

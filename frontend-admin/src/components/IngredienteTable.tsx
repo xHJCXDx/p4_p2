@@ -16,21 +16,22 @@ interface IngredienteTableProps {
   onEdit: (ingrediente: Ingrediente) => void;
   onDelete: (id: number) => void;
   isLoading?: boolean;
+  isAdmin?: boolean;
 }
 
 const columnHelper = createColumnHelper<Ingrediente>();
 
-export function IngredienteTable({ data, onEdit, onDelete, isLoading = false }: IngredienteTableProps) {
+export function IngredienteTable({ data, onEdit, onDelete, isLoading = false, isAdmin = true }: IngredienteTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', {
+      ...(isAdmin ? [columnHelper.accessor('id', {
         header: 'ID',
         cell: (info) => info.getValue(),
         size: 50,
-      }),
+      })] : []),
       columnHelper.accessor('nombre', {
         header: 'Nombre',
         cell: (info) => info.getValue(),
@@ -46,11 +47,11 @@ export function IngredienteTable({ data, onEdit, onDelete, isLoading = false }: 
         header: 'Stock',
         cell: (info) => (
           <span className={info.getValue() > 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
-            {info.getValue()}
+            {info.getValue()} {info.row.original.unidad_medida_codigo}
           </span>
         ),
         enableSorting: true,
-        size: 80,
+        size: 120,
       }),
       columnHelper.accessor('es_alergeno', {
         header: 'Alergeno',
@@ -61,7 +62,7 @@ export function IngredienteTable({ data, onEdit, onDelete, isLoading = false }: 
         ),
         size: 100,
       }),
-      columnHelper.display({
+      ...(isAdmin ? [columnHelper.display({
         id: 'actions',
         header: 'Acciones',
         cell: (info) => (
@@ -81,9 +82,9 @@ export function IngredienteTable({ data, onEdit, onDelete, isLoading = false }: 
           </div>
         ),
         size: 150,
-      }),
+      })] : []),
     ],
-    [onEdit, onDelete]
+    [onEdit, onDelete, isAdmin]
   );
 
   const table = useReactTable({

@@ -15,18 +15,18 @@ def seed_data_completo(session: Session) -> None:
     # ============ INGREDIENTES ============
     def seed_ingredientes():
         ingredientes_data = [
-            {"nombre": "Queso Mozzarella", "descripcion": "Queso fresco derretible", "es_alergeno": False, "stock_cantidad": 200},
-            {"nombre": "Tomate", "descripcion": "Tomate fresco", "es_alergeno": False, "stock_cantidad": 150},
-            {"nombre": "Oregano", "descripcion": "Hierba aromática", "es_alergeno": False, "stock_cantidad": 300},
-            {"nombre": "Maní", "descripcion": "Cacahuete", "es_alergeno": True, "stock_cantidad": 50},
-            {"nombre": "Leche", "descripcion": "Leche fresca", "es_alergeno": True, "stock_cantidad": 100},
-            {"nombre": "Huevo", "descripcion": "Huevo fresco", "es_alergeno": True, "stock_cantidad": 120},
-            {"nombre": "Gluten", "descripcion": "Harina con gluten", "es_alergeno": True, "stock_cantidad": 250},
-            {"nombre": "Carne molida", "descripcion": "Carne vacuna molida", "es_alergeno": False, "stock_cantidad": 100},
-            {"nombre": "Cebolla", "descripcion": "Cebolla fresca", "es_alergeno": False, "stock_cantidad": 180},
-            {"nombre": "Ajo", "descripcion": "Ajo fresco", "es_alergeno": False, "stock_cantidad": 200},
-            {"nombre": "Coca-Cola 2L", "descripcion": "Botella de Coca-Cola 2 litros", "es_alergeno": False, "stock_cantidad": 200},
-            {"nombre": "Naranja", "descripcion": "Naranja fresca para exprimir", "es_alergeno": False, "stock_cantidad": 150},
+            {"nombre": "Queso Mozzarella", "descripcion": "Queso fresco derretible", "es_alergeno": False, "stock_cantidad": 200, "unidad_medida_codigo": "g"},
+            {"nombre": "Tomate", "descripcion": "Tomate fresco", "es_alergeno": False, "stock_cantidad": 150, "unidad_medida_codigo": "u"},
+            {"nombre": "Oregano", "descripcion": "Hierba aromática", "es_alergeno": False, "stock_cantidad": 300, "unidad_medida_codigo": "g"},
+            {"nombre": "Maní", "descripcion": "Cacahuete", "es_alergeno": True, "stock_cantidad": 50, "unidad_medida_codigo": "g"},
+            {"nombre": "Leche", "descripcion": "Leche fresca", "es_alergeno": True, "stock_cantidad": 100, "unidad_medida_codigo": "l"},
+            {"nombre": "Huevo", "descripcion": "Huevo fresco", "es_alergeno": True, "stock_cantidad": 120, "unidad_medida_codigo": "u"},
+            {"nombre": "Gluten", "descripcion": "Harina con gluten", "es_alergeno": True, "stock_cantidad": 250, "unidad_medida_codigo": "kg"},
+            {"nombre": "Carne molida", "descripcion": "Carne vacuna molida", "es_alergeno": False, "stock_cantidad": 100, "unidad_medida_codigo": "kg"},
+            {"nombre": "Cebolla", "descripcion": "Cebolla fresca", "es_alergeno": False, "stock_cantidad": 180, "unidad_medida_codigo": "u"},
+            {"nombre": "Ajo", "descripcion": "Ajo fresco", "es_alergeno": False, "stock_cantidad": 200, "unidad_medida_codigo": "u"},
+            {"nombre": "Coca-Cola 2L", "descripcion": "Botella de Coca-Cola 2 litros", "es_alergeno": False, "stock_cantidad": 200, "unidad_medida_codigo": "u"},
+            {"nombre": "Naranja", "descripcion": "Naranja fresca para exprimir", "es_alergeno": False, "stock_cantidad": 150, "unidad_medida_codigo": "u"},
         ]
 
         ingredientes = {}

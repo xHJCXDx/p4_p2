@@ -1,6 +1,6 @@
 from sqlmodel import Session
 from app.core.unit_of_work import BaseUnitOfWork
-from app.catalogo.repository import FormaPagoRepository, EstadoPedidoRepository
+from app.catalogo.repository import FormaPagoRepository, EstadoPedidoRepository, UnidadMedidaRepository
 
 
 class CatalogoUnitOfWork(BaseUnitOfWork):
@@ -10,3 +10,4 @@ class CatalogoUnitOfWork(BaseUnitOfWork):
         super().__init__(session)
         self.formas_pago = FormaPagoRepository(session)
         self.estados_pedido = EstadoPedidoRepository(session)
+        self.unidades_medida = UnidadMedidaRepository(session)

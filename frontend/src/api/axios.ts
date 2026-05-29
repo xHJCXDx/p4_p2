@@ -7,9 +7,8 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  if (config.url && !config.url.endsWith('/')) {
-    const [path, query] = config.url.split('?');
-    config.url = query ? `${path}/?${query}` : `${path}/`;
+  if (config.url && !config.url.endsWith('/') && !config.url.includes('?')) {
+    config.url = `${config.url}/`;
   }
   return config;
 });

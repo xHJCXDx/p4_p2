@@ -13,6 +13,7 @@ from app.usuario.router import router as auth_router
 from app.usuario.model import Rol, Usuario
 from app.direccion.router import router as direccion_router
 from app.admin.router import router as admin_router
+from app.catalogo.model import UnidadMedida, FormaPago, EstadoPedido  # noqa: F401 — force table registration
 from app.catalogo.service import seed_catalogos
 from app.seed import seed_data_completo
 
@@ -34,8 +35,8 @@ def seed_users(session: Session):
     users_data = [
         {"nombre": "Admin", "apellido": "Sistema", "email": "admin@admin.com", "password": "admin123", "rol": "ADMIN"},
         {"nombre": "Cliente", "apellido": "Demo", "email": "cliente@test.com", "password": "cliente123", "rol": "CLIENT"},
-        {"nombre": "Empleado", "apellido": "Pedidos", "email": "empleado@cafe.com", "password": "empleado123", "rol": "PEDIDOS"},
-        {"nombre": "Gerente", "apellido": "Stock", "email": "gerente@cafe.com", "password": "gerente123", "rol": "STOCK"},
+        {"nombre": "Empleado", "apellido": "Pedidos", "email": "empleado@tienda.com", "password": "empleado123", "rol": "PEDIDOS"},
+        {"nombre": "Gerente", "apellido": "Stock", "email": "gerente@tienda.com", "password": "gerente123", "rol": "STOCK"},
     ]
 
     for user_data in users_data:

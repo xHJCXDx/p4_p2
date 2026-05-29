@@ -1,12 +1,67 @@
 from fastapi import APIRouter, Depends, status, Query
+from pydantic import BaseModel
 from sqlmodel import Session
 from app.core.database import get_session
 from app.core.response import success_response, error_response, ApiResponse
 from app.core.security import require_roles
 from app.ingrediente.schema import IngredienteCreate, IngredienteRead, IngredienteUpdate
 from app.ingrediente import service
+from app.catalogo.model import UnidadMedida
+from app.catalogo.unit_of_work import CatalogoUnitOfWork
 
 router = APIRouter(prefix="/api/v1/ingredientes", tags=["Ingredientes"])
+
+
+class UnidadMedidaCreate(BaseModel):
+    codigo: str
+    nombre: str
+
+
+@router.get("/unidades-medida")
+def read_unidades_medida(session: Session = Depends(get_session)) -> ApiResponse:
+    uow = CatalogoUnitOfWork(session)
+    unidades = uow.unidades_medida.get_all_simple()
+    return success_response(
+        data=[{"codigo": u.codigo, "nombre": u.nombre} for u in unidades],
+        message="Unidades de medida obtenidas"
+    )
+
+
+@router.post("/unidades-medida", status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_roles("ADMIN", "STOCK"))])
+def create_unidad_medida(data: UnidadMedidaCreate, session: Session = Depends(get_session)) -> ApiResponse:
+    uow = CatalogoUnitOfWork(session)
+    existing = uow.unidades_medida.get_by_id(data.codigo)
+    if existing:
+        return error_response(message=f"La unidad '{data.codigo}' ya existe", status_code=400)
+    new_um = UnidadMedida(codigo=data.codigo, nombre=data.nombre)
+    uow.unidades_medida.create(new_um)
+    uow.commit()
+    return success_response(
+        data={"codigo": new_um.codigo, "nombre": new_um.nombre},
+        message="Unidad de medida creada",
+        status_code=201
+    )
+
+@router.delete("/unidades-medida/{codigo}", dependencies=[Depends(require_roles("ADMIN", "STOCK"))])
+def delete_unidad_medida(codigo: str, session: Session = Depends(get_session)) -> ApiResponse:
+    uow = CatalogoUnitOfWork(session)
+    um = uow.unidades_medida.get_by_id(codigo)
+    if not um:
+        return error_response(message="Unidad de medida no encontrada", status_code=404)
+    from sqlmodel import select
+    from app.ingrediente.model import Ingrediente
+    en_uso = session.exec(
+        select(Ingrediente).where(Ingrediente.unidad_medida_codigo == codigo)
+    ).first()
+    if en_uso:
+        return error_response(
+            message=f"No se puede eliminar: hay ingredientes usando '{codigo}'",
+            status_code=400
+        )
+    session.delete(um)
+    session.commit()
+    return success_response(message="Unidad de medida eliminada")
+
 
 @router.get("/")
 def read_ingredientes(

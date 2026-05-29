@@ -1,11 +1,13 @@
 import { usePedidos, useTransitionEstado } from '../../hooks/usePedidos';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useToast } from '../../components/Toast';
 
 export default function CajeroPage() {
   const { data: pedidos = [], isLoading } = usePedidos();
   const { mutate: transitionEstado } = useTransitionEstado();
   const { usuario } = useAuthStore();
 
+  const { showToast } = useToast();
   const isAdmin = usuario?.roles.some((r) => r.codigo === 'ADMIN') ?? false;
   const isPedidos = usuario?.roles.some((r) => r.codigo === 'PEDIDOS') ?? false;
   const canManageOrders = isAdmin || isPedidos;
@@ -21,10 +23,10 @@ export default function CajeroPage() {
       { pedido_id: pedidoId, accion },
       {
         onSuccess: () => {
-          alert('Estado actualizado');
+          showToast('Estado actualizado', 'success');
         },
         onError: (error: any) => {
-          alert(`Error: ${error.response?.data?.detail || 'No se pudo actualizar el estado'}`);
+          showToast(error.response?.data?.detail || 'No se pudo actualizar el estado', 'error');
         },
       }
     );

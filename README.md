@@ -1,7 +1,7 @@
 # Parcial 2 - Programación IV (UTN)
 
 **Autores**: Hiro Cruz, Mauricio Manzano  
-**Proyecto**: Delivery de Alimentos - Full Stack
+**Proyecto**: Tienda de Alimentos - Full Stack
 
 ## Descripción General
 

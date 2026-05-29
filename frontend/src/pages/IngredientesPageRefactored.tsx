@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Ingrediente } from '../types/ingrediente';
 import { IngredienteFormSimple } from '../components/IngredienteFormSimple';
 import { IngredienteTable } from '../components/IngredienteTable';
@@ -8,6 +8,8 @@ import {
   useUpdateIngrediente,
   useDeleteIngrediente,
 } from '../hooks/useIngredientes';
+import { useConfirm } from '../components/ConfirmDialog';
+import { useToast } from '../components/Toast';
 
 function IngredientesPageRefactored() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,13 +21,8 @@ function IngredientesPageRefactored() {
   const createMutation = useCreateIngrediente();
   const updateMutation = useUpdateIngrediente();
   const deleteMutation = useDeleteIngrediente();
-
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage]);
+  const confirmDialog = useConfirm();
+  const { showToast } = useToast();
 
   const handleFormSubmit = async (data: Omit<Ingrediente, 'id' | 'created_at' | 'updated_at'>) => {
     try {
@@ -34,28 +31,29 @@ function IngredientesPageRefactored() {
           id: selectedIngrediente.id,
           data,
         });
-        setSuccessMessage('Ingrediente actualizado exitosamente');
+        showToast('Ingrediente actualizado', 'success');
       } else {
         await createMutation.mutateAsync(data);
-        setSuccessMessage('Ingrediente creado exitosamente');
+        showToast('Ingrediente creado', 'success');
       }
       setIsModalOpen(false);
       setSelectedIngrediente(null);
     } catch (err) {
       console.error('Error:', err);
-      setError(`Error al ${selectedIngrediente ? 'actualizar' : 'crear'} el ingrediente`);
+      showToast(`Error al ${selectedIngrediente ? 'actualizar' : 'crear'} el ingrediente`, 'error');
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este ingrediente?')) return;
+    const ok = await confirmDialog({ message: '¿Estas seguro de eliminar este ingrediente?' });
+    if (!ok) return;
 
     try {
       await deleteMutation.mutateAsync(id);
-      setSuccessMessage('Ingrediente eliminado exitosamente');
+      showToast('Ingrediente eliminado', 'success');
     } catch (err) {
       console.error('Error deleting:', err);
-      setError('Error al eliminar el ingrediente');
+      showToast('Error al eliminar el ingrediente', 'error');
     }
   };
 

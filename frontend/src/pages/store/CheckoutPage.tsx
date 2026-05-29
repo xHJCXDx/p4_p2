@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDirecciones } from '../../hooks/useDirecciones';
 import { useCreatePedido } from '../../hooks/usePedidos';
 import { useCarritoStore } from '../../store/useCarritoStore';
+import { useToast } from '../../components/Toast';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function CheckoutPage() {
 
   const [selectedDireccionId, setSelectedDireccionId] = useState<number | null>(null);
   const [formaPago, setFormaPago] = useState('EFECTIVO');
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (direcciones.length > 0 && selectedDireccionId === null) {
@@ -24,7 +26,7 @@ export default function CheckoutPage() {
     e.preventDefault();
 
     if (!selectedDireccionId) {
-      alert('Selecciona una dirección de entrega');
+      showToast('Selecciona una direccion de entrega', 'error');
       return;
     }
 
@@ -41,11 +43,11 @@ export default function CheckoutPage() {
       {
         onSuccess: () => {
           clearCarrito();
-          alert('Pedido creado exitosamente');
+          showToast('Pedido creado exitosamente', 'success');
           navigate('/store/mis-pedidos');
         },
         onError: (error: any) => {
-          alert(`Error: ${error.response?.data?.detail || 'No se pudo crear el pedido'}`);
+          showToast(error.response?.data?.detail || 'No se pudo crear el pedido', 'error');
         },
       }
     );

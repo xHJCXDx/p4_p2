@@ -27,11 +27,11 @@ export function ProductoTable({ data, onEdit, onDelete, isLoading = false, isAdm
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', {
+      ...(isAdmin ? [columnHelper.accessor('id', {
         header: 'ID',
         cell: (info) => info.getValue(),
         size: 50,
-      }),
+      })] : []),
       columnHelper.accessor('nombre', {
         header: 'Nombre',
         cell: (info) => info.getValue(),
@@ -107,12 +107,12 @@ export function ProductoTable({ data, onEdit, onDelete, isLoading = false, isAdm
         },
         enableSorting: false,
       }),
-      columnHelper.display({
+      ...(isAdmin ? [columnHelper.display({
         id: 'actions',
         header: 'Acciones',
         cell: (info) => (
           <div className="flex gap-2">
-            {isAdmin && onEdit && (
+            {onEdit && (
               <button
                 onClick={() => onEdit(info.row.original)}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-sm transition-colors"
@@ -120,7 +120,7 @@ export function ProductoTable({ data, onEdit, onDelete, isLoading = false, isAdm
                 Editar
               </button>
             )}
-            {isAdmin && onDelete && (
+            {onDelete && (
               <button
                 onClick={() => onDelete(info.row.original.id)}
                 className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-sm transition-colors"
@@ -131,9 +131,9 @@ export function ProductoTable({ data, onEdit, onDelete, isLoading = false, isAdm
           </div>
         ),
         size: 180,
-      }),
+      })] : []),
     ],
-    [onEdit, onDelete]
+    [onEdit, onDelete, isAdmin]
   );
 
   const table = useReactTable({

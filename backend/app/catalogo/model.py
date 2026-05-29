@@ -1,6 +1,15 @@
 from typing import Optional
 from sqlmodel import Field, SQLModel
 
+
+class UnidadMedidaBase(SQLModel):
+    nombre: str = Field(max_length=50)
+
+
+class UnidadMedida(UnidadMedidaBase, table=True):
+    codigo: str = Field(primary_key=True, max_length=10)
+
+
 class FormaPagoBase(SQLModel):
     descripcion: str = Field(max_length=80)
     habilitado: bool = Field(default=True)

@@ -9,6 +9,8 @@ import {
   useUpdateProducto,
   useDeleteProducto,
 } from '../hooks/useProductos';
+import { useConfirm } from '../components/ConfirmDialog';
+import { useToast } from '../components/Toast';
 
 function ProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,13 +49,18 @@ function ProductsPage() {
     }
   };
 
+  const confirm = useConfirm();
+  const { showToast } = useToast();
+
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Estas seguro de eliminar este producto?')) return;
+    const ok = await confirm({ message: '¿Estas seguro de eliminar este producto?' });
+    if (!ok) return;
     try {
       await deleteMutation.mutateAsync(id);
+      showToast('Producto eliminado', 'success');
     } catch (err) {
       console.error('Error deleting producto:', err);
-      setError('Error al eliminar el producto');
+      showToast('Error al eliminar el producto', 'error');
     }
   };
 

@@ -1,12 +1,19 @@
 from sqlmodel import Session
-from app.catalogo.model import FormaPago, EstadoPedido
-from app.core.constants import FORMAS_PAGO, ESTADOS_PEDIDO
+from app.catalogo.model import FormaPago, EstadoPedido, UnidadMedida
+from app.core.constants import FORMAS_PAGO, ESTADOS_PEDIDO, UNIDADES_MEDIDA
 from app.catalogo.unit_of_work import CatalogoUnitOfWork
 
 
 def seed_catalogos(session: Session) -> None:
-    """Inicializa los catálogos de FormaPago y EstadoPedido si no existen."""
+    """Inicializa los catálogos de FormaPago, EstadoPedido y UnidadMedida si no existen."""
     uow = CatalogoUnitOfWork(session)
+
+    # Seed UnidadMedida
+    for um_data in UNIDADES_MEDIDA:
+        existing = uow.unidades_medida.get_by_id(um_data["codigo"])
+        if not existing:
+            new_um = UnidadMedida(**um_data)
+            uow.unidades_medida.create(new_um)
 
     # Seed FormaPago
     for fp_data in FORMAS_PAGO:
