@@ -1,399 +1,297 @@
-# Parcial 2 - Programación IV (UTN)
+# Tienda de Alimentos - Parcial 2
 
-**Autores**: Hiro Cruz, Mauricio Manzano  
-**Proyecto**: Tienda de Alimentos - Full Stack
+**Materia:** Programacion IV - UTN  
+**Autores:** Hiro Cruz, Mauricio Manzano  
+**Repositorio publico** conforme a los requisitos de evaluacion.
 
-## Descripción General
+---
 
-**Parcial 2** es una evolución significativa del TP Integrador (P4_P1), ampliando la arquitectura con autenticación, autorización, gestión de pedidos y una tienda pública funcional.
+## Descripcion
 
-## Novedades en Parcial 2 vs TP Integrador (P4_P1)
+Aplicacion fullstack que integra un backend REST (FastAPI + PostgreSQL) con dos frontends React (tienda publica y panel administrativo). El proyecto demuestra persistencia relacional, autenticacion JWT, control de acceso por roles, gestion de pedidos con maquina de estados y patrones de arquitectura backend.
 
-Parcial 2 amplía significativamente la funcionalidad del TP Integrador:
+---
 
-- **Autenticación y Autorización**: Sistema JWT con roles RBAC (ADMIN, GERENTE, REPARTIDOR, CLIENTE)
-- **Gestión de Pedidos**: Máquina de estados validada, detalles de compra con snapshots, historial de transiciones
-- **Módulos Nuevos**: Usuarios, Direcciones, Ingredientes, Panel Administrativo
-- **Tienda Pública**: Catálogo de productos, carrito, checkout y historial de pedidos del cliente
-- **Mejoras Backend**: Unit of Work Pattern, Repository Pattern, API versionada (`/api/v1/`)
-- **Mejoras Frontend**: React Router protegido, State Management con Zustand, TanStack Query para servidor
-- **Base de Datos**: PostgreSQL con soft deletes, auditoría automática y relaciones complejas
+## Requisitos previos
 
-## Proyecto Full Stack: React + TypeScript + FastAPI
-
-## Requisitos Previos
-
-- Python 3.8+
+- Python 3.10+
 - Node.js 18+
-- npm
+- PostgreSQL 14+
 
-## Estructura del Proyecto - Parcial 2
+---
 
-```
-p4_p2/
-├── backend/          # API FastAPI con autenticación y autorización
-│   ├── app/
-│   │   ├── core/                    # Configuración central
-│   │   │   ├── database.py
-│   │   │   ├── security.py
-│   │   │   ├── constants.py
-│   │   │   ├── response.py
-│   │   │   ├── repository.py
-│   │   │   └── unit_of_work.py
-│   │   │
-│   │   ├── usuario/                 # Autenticación (NUEVO)
-│   │   │   ├── model.py
-│   │   │   ├── schema.py
-│   │   │   ├── service.py
-│   │   │   ├── repository.py
-│   │   │   └── router.py
-│   │   │
-│   │   ├── categoria/
-│   │   ├── producto/
-│   │   ├── ingrediente/             # (NUEVO)
-│   │   ├── pedido/                  # (NUEVO)
-│   │   ├── direccion/               # (NUEVO)
-│   │   ├── catalogo/                # (NUEVO)
-│   │   ├── admin/                   # (NUEVO)
-│   │   ├── seed.py
-│   │   └── main.py
-│   │
-│   ├── database.db
-│   ├── requirements.txt
-│   └── api.http
-│
-└── frontend/         # React + TypeScript + Vite
-    ├── src/
-    │   ├── api/                     # Axios config (NUEVO)
-    │   ├── components/
-    │   ├── hooks/                   # Custom hooks (NUEVO)
-    │   ├── pages/
-    │   ├── store/                   # Zustand stores (NUEVO)
-    │   ├── types/
-    │   ├── App.tsx
-    │   └── main.tsx
-    │
-    ├── package.json
-    ├── vite.config.ts
-    └── tailwind.config.ts
-```
-
-## Instalación y Ejecución
+## Instalacion y ejecucion
 
 ### Backend
 
 ```bash
 cd backend
-
-# Crear y activar entorno virtual
 python -m venv .venv
-
-# En macOS/Linux:
-source .venv/bin/activate
-
-# En Windows:
-.venv\Scripts\activate
-
-# Instalar dependencias
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-
-# Ejecutar servidor
-fastapi dev main.py
+fastapi dev app/main.py
 ```
 
-El servidor estará disponible en `http://localhost:8000`
-- Documentación interactiva: `http://localhost:8000/docs`
+Servidor disponible en `http://localhost:8000`.  
+Documentacion interactiva: `http://localhost:8000/docs` (Swagger UI) y `/redoc`.
 
-### Frontend
+El backend crea la base de datos automaticamente si no existe y ejecuta el seed de datos obligatorios al iniciar.
+
+### Frontend - Tienda publica
 
 ```bash
 cd frontend
-
-# Instalar dependencias
 npm install
-
-# Ejecutar en desarrollo
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:5173`
+Disponible en `http://localhost:5173`.
+
+### Frontend - Panel administrativo
+
+```bash
+cd frontend-admin
+npm install
+npm run dev
+```
+
+Disponible en `http://localhost:5174`.
 
 ---
 
-## Modelo de Datos (Conforme ERD - Dominio 2)
+## Estructura del proyecto
 
-### **Tabla: Producto**
-- `id` (BIGINT, PK)
-- `nombre` (VARCHAR(150), NN, Indexed)
-- `descripcion` (TEXT)
-- `precio_base` (DECIMAL(10,2), NN, CHECK >= 0)
-- `imagenes_url` (JSON Array)
-- `stock_cantidad` (INTEGER, NN, DEFAULT 0, CHECK >= 0)
-- `disponible` (BOOLEAN, NN, DEFAULT true)
-- `created_at` (TIMESTAMPTZ, NN)
-- `updated_at` (TIMESTAMPTZ, NN)
-- `deleted_at` (TIMESTAMPTZ, nullable) ← Soft Delete
-
-### **Tabla: Categoria**
-- `id` (BIGINT, PK)
-- `parent_id` (BIGINT, FK -> Categoria.id, nullable) ← Jerarquía/Auto-referencia
-- `nombre` (VARCHAR(100), NN, UNIQUE)
-- `descripcion` (TEXT)
-- `imagen_url` (TEXT, nullable)
-- `created_at` (TIMESTAMPTZ, NN)
-- `updated_at` (TIMESTAMPTZ, NN)
-- `deleted_at` (TIMESTAMPTZ, nullable) ← Soft Delete
-
-### **Tabla: Ingrediente**
-- `id` (BIGINT, PK)
-- `nombre` (VARCHAR(100), NN, UNIQUE, Indexed)
-- `descripcion` (TEXT)
-- `es_alergeno` (BOOLEAN, NN, DEFAULT false)
-- `created_at` (TIMESTAMPTZ, NN)
-- `updated_at` (TIMESTAMPTZ, NN)
-
-### **Tabla: ProductoCategoria** (Many-to-Many)
-- `producto_id` (BIGINT, PK, FK -> Producto.id)
-- `categoria_id` (BIGINT, PK, FK -> Categoria.id)
-- `es_principal` (BOOLEAN, NN, DEFAULT false)
-- `created_at` (TIMESTAMPTZ, NN)
-
-### **Tabla: ProductoIngrediente** (Many-to-Many)
-- `producto_id` (BIGINT, PK, FK -> Producto.id)
-- `ingrediente_id` (BIGINT, PK, FK -> Ingrediente.id)
-- `es_removible` (BOOLEAN, NN, DEFAULT false)
+```
+p4_p2/
+├── backend/
+│   └── app/
+│       ├── core/               Configuracion central (database, security, constants, response, repository, unit_of_work)
+│       ├── usuario/            Autenticacion, registro, roles (model, schema, service, repository, router, unit_of_work)
+│       ├── categoria/          CRUD categorias con autorreferencia (parent_id)
+│       ├── producto/           CRUD productos con relaciones N:N a categorias e ingredientes
+│       ├── ingrediente/        CRUD ingredientes con stock, unidad de medida y alergenos
+│       ├── venta/              Pedidos, detalles, pagos, historial de estados (FSM)
+│       ├── direccion/          Direcciones de entrega del usuario
+│       ├── catalogo/           Tablas de referencia: UnidadMedida, FormaPago, EstadoPedido
+│       ├── admin/              Gestion de usuarios y asignacion de roles
+│       ├── seed.py             Seed de datos de ejemplo (productos, ingredientes, categorias)
+│       └── main.py             Punto de entrada, lifespan, registro de routers, CORS
+│
+├── frontend/                   Tienda publica (React + TypeScript + Vite)
+│   └── src/
+│       ├── api/                Instancia de Axios con interceptor
+│       ├── components/         Componentes reutilizables (Toast, ConfirmDialog, tablas)
+│       ├── hooks/              Custom hooks con TanStack Query (useQuery, useMutation)
+│       ├── pages/store/        Home, carrito, checkout, mis pedidos, detalle de producto
+│       ├── pages/admin/        Login empleado, cajero
+│       ├── store/              Zustand (auth, carrito)
+│       └── types/              Interfaces TypeScript
+│
+└── frontend-admin/             Panel de administracion (React + TypeScript + Vite)
+    └── src/
+        ├── api/                Instancia de Axios con interceptor
+        ├── components/         Tablas (TanStack Table), formularios, Toast, ConfirmDialog
+        ├── hooks/              Custom hooks con TanStack Query
+        ├── pages/              Categorias, productos, ingredientes, pedidos
+        ├── store/              Zustand (auth)
+        └── types/              Interfaces TypeScript
+```
 
 ---
 
-## Características Implementadas
+## Backend - Arquitectura y patrones
 
-### Backend (FastAPI) - Parcial 2
+### Capas de la aplicacion
 
-#### Autenticación y Autorización
-- **JWT Token-based Auth**
-  - `POST /api/v1/auth/register` - Registrar nuevo usuario
-  - `POST /api/v1/auth/login` - Login (retorna access_token)
-  - `POST /api/v1/auth/refresh` - Refrescar token expirado
-  - `POST /api/v1/auth/logout` - Logout (invalida token)
+| Capa | Responsabilidad |
+|------|----------------|
+| Router | Recibe HTTP requests. Define path/query params con `Annotated`, `Query` y `Path`. Retorna `ApiResponse`. |
+| Service | Logica de negocio stateless. Nunca accede a la session directamente. |
+| Unit of Work | Context manager que encapsula la transaccion. Commit automatico al salir, rollback en caso de error. |
+| Repository | Acceso a datos. `BaseRepository[T]` generico con CRUD base; cada modulo extiende con queries propias. |
+| Schema | Contratos de entrada/salida con Pydantic. Separacion en Create, Read, Update. |
 
-- **RBAC (Role-Based Access Control)**
-  - Roles: ADMIN, GERENTE, REPARTIDOR, CLIENTE
-  - Seed automático de roles obligatorios
-  - Usuario ADMIN por defecto (admin@admin.com / admin123)
-  - Decoradores: `@require_auth`, `@require_role("ADMIN")`
+### Patrones implementados
 
-#### CRUD Categorías (Parcial 1 + mejoras)
-- `GET /api/v1/categorias?limit=10&offset=0` - Listar con paginación
-- `GET /api/v1/categorias/{id}` - Obtener por ID
-- `POST /api/v1/categorias` - Crear nueva (solo ADMIN)
-- `PUT /api/v1/categorias/{id}` - Actualizar (solo ADMIN)
-- `DELETE /api/v1/categorias/{id}` - Soft delete (solo ADMIN)
-- **Nuevo**: Auto-referencia con `parent_id` (subcategorías)
+| Patron | Descripcion |
+|--------|-------------|
+| Unit of Work | Gestion transaccional atomica. El service nunca hace `session.commit()` directamente. |
+| Repository | `BaseRepository[T]` generico; cada modulo extiende con queries propias. |
+| Service Layer | Logica de negocio desacoplada del router y de la base de datos. |
+| Soft Delete | Campo `deleted_at` (TIMESTAMPTZ nullable). Las queries filtran `WHERE deleted_at IS NULL`. |
+| Snapshot | `DetallePedido` almacena `nombre_snapshot` y `precio_snapshot` inmutables al momento de la compra. |
+| Audit Trail Append-Only | `HistorialEstadoPedido` solo permite INSERTs, nunca UPDATE ni DELETE. |
+| FSM (Maquina de estados) | Transiciones validadas en el service. El router no decide la logica de estados. |
 
-#### CRUD Productos (Parcial 1 + mejoras)
-- `GET /api/v1/productos?limit=10&offset=0` - Listar con paginación, filtros
-- `GET /api/v1/productos/{id}` - Obtener por ID
-- `POST /api/v1/productos` - Crear nuevo (solo ADMIN)
-- `PUT /api/v1/productos/{id}` - Actualizar (solo ADMIN)
-- `DELETE /api/v1/productos/{id}` - Soft delete (solo ADMIN)
-- **Nuevo**: Relaciones Many-to-Many con Ingredientes
+### Autenticacion y autorizacion
 
-#### CRUD Ingredientes (Nuevo en Parcial 2)
-- `GET /api/v1/ingredientes?limit=10&offset=0` - Listar con paginación
-- `GET /api/v1/ingredientes/{id}` - Obtener por ID
-- `POST /api/v1/ingredientes` - Crear nuevo (solo ADMIN)
-- `PUT /api/v1/ingredientes/{id}` - Actualizar (solo ADMIN)
-- `DELETE /api/v1/ingredientes/{id}` - Hard delete (sin soft delete)
-- **Soporte**: Campo `es_alergeno` para alertas
+- Registro de usuarios con asignacion automatica del rol CLIENT.
+- Login con email/password genera cookie httpOnly `access_token` (JWT, 30 minutos).
+- Endpoint `GET /api/v1/auth/me` retorna los datos del usuario autenticado.
+- Hash de contrasenas con bcrypt (cost factor 12).
 
-#### CRUD Pedidos (Nuevo en Parcial 2)
-- `GET /api/v1/pedidos?limit=10&offset=0` - Listar con paginación
-- `GET /api/v1/pedidos/{id}` - Obtener por ID con detalles completos
-- `POST /api/v1/pedidos` - Crear nuevo pedido (solo CLIENTE)
-- `PUT /api/v1/pedidos/{id}` - Actualizar pedido (notas, costo_envio)
-- `DELETE /api/v1/pedidos/{id}` - Soft delete (solo ADMIN)
-- `POST /api/v1/pedidos/{id}/transition-estado` - Cambiar estado (FSM validado)
-- `GET /api/v1/pedidos/{id}/detalles` - Obtener detalles (con snapshots)
-- `POST /api/v1/pedidos/{id}/detalles` - Agregar detalle a pedido
-- `GET /api/v1/pedidos/{id}/pagos` - Obtener pagos realizados
-- `POST /api/v1/pedidos/{id}/pagos` - Registrar pago (MercadoPago)
-- `PUT /api/v1/pedidos/{id}/pagos/{pago_id}` - Actualizar pago
+### Sistema de roles (RBAC)
 
-#### CRUD Direcciones (Nuevo en Parcial 2)
-- `GET /api/v1/usuarios/{usuario_id}/direcciones` - Listar direcciones del usuario
-- `POST /api/v1/usuarios/{usuario_id}/direcciones` - Crear nueva dirección
-- `PUT /api/v1/direcciones/{id}` - Actualizar dirección
-- `DELETE /api/v1/direcciones/{id}` - Eliminar dirección
-- **Validación**: Calle, número, departamento, ciudad, código postal, provincia
+| Rol | Codigo | Capacidades |
+|-----|--------|-------------|
+| Administrador | ADMIN | CRUD completo de todo el sistema |
+| Gestor de Stock | STOCK | Leer productos, gestionar ingredientes, unidades de medida y stock |
+| Gestor de Pedidos | PEDIDOS | Ver y avanzar estados de pedidos |
+| Cliente | CLIENT | Catalogo, carrito, pedidos propios |
 
-#### Admin Panel (Nuevo en Parcial 2)
-- `GET /api/v1/admin/estadisticas` - Estadísticas globales (solo ADMIN)
-- `GET /api/v1/admin/usuarios` - Listar todos los usuarios (solo ADMIN)
-- `PUT /api/v1/admin/usuarios/{id}/roles` - Asignar/remover roles (solo ADMIN)
-- `GET /api/v1/admin/pedidos` - Ver todos los pedidos sin filtro (solo ADMIN)
+Los roles se seedean automaticamente al iniciar la aplicacion. El decorador `require_roles()` protege los endpoints.
 
-#### Catálogos (Nuevo en Parcial 2)
-- **FormaPago**: MERCADOPAGO, EFECTIVO, TRANSFERENCIA
-- **EstadoPedido**: PENDIENTE, CONFIRMADO, EN_PREP, EN_CAMINO, ENTREGADO, CANCELADO
-- **Estados**: Seed automático al iniciar la aplicación
+### Endpoints principales
 
-#### Características Técnicas
-- **Paginación**: Query params `limit` (1-100, default 10) y `offset` (default 0)
-- **Respuestas estandarizadas**: `{ success, message, data, status_code }`
-- **Soft Delete**: Registros marcados con `deleted_at` (excepto Ingredientes)
-- **Auditoría**: `created_at`, `updated_at`, `deleted_at` en todas las tablas
-- **Relaciones**: Many-to-Many (Producto-Categoría, Producto-Ingrediente), Auto-referencia (Categoría)
-- **CORS**: Configurado para localhost:5173
-- **Docs automáticos**: Swagger en `/api/v1/docs`
-- **FSM**: Validación automática de transiciones de estado en Pedidos
-- **Snapshots**: Copias immutables de precio/nombre en DetallePedido
-- **Unit of Work**: Transacciones atómicas con context manager
-- **Repository Pattern**: Abstracción de acceso a datos
-- **Prefijo API**: `/api/v1/` para versionamiento
+**Autenticacion** (`/api/v1/auth/`)
 
-### Frontend (React + TypeScript) - Parcial 2
+| Metodo | Ruta | Descripcion |
+|--------|------|-------------|
+| POST | /register | Registrar usuario (asigna rol CLIENT) |
+| POST | /login | Login, genera cookie httpOnly con JWT |
+| POST | /logout | Elimina cookie de sesion |
+| GET | /me | Datos del usuario autenticado |
 
-#### Routing con React Router v6
-- **Rutas Públicas**:
-  - `/` - Redirige a `/store/home`
-  - `/store/home` - Catálogo de productos (HomeStorePage)
-  - `/store/carrito` - Carrito de compras (CarritoPage)
-  - `/store/checkout` - Flujo de compra (CheckoutPage)
+**Categorias** (`/api/v1/categorias/`)
 
-- **Rutas Protegidas (CLIENTE)**:
-  - `/store/mis-pedidos` - Historial de pedidos del usuario (MisPedidosPage)
+| Metodo | Ruta | Descripcion | Rol requerido |
+|--------|------|-------------|---------------|
+| GET | / | Listado publico con paginacion y filtro por parent_id | - |
+| GET | /{id} | Detalle de categoria | - |
+| POST | / | Crear categoria | ADMIN |
+| PUT | /{id} | Actualizar categoria | ADMIN |
+| DELETE | /{id} | Soft delete | ADMIN |
 
-- **Rutas de Administración** (solo ADMIN):
-  - `/admin/categorias` - Gestión de categorías
-  - `/admin/productos` - Gestión de productos
-  - `/admin/ingredientes` - Gestión de ingredientes
-  - `/admin/pedidos` - Ver todos los pedidos
+Soporta jerarquia con autorreferencia (`parent_id`).
 
-- **Rutas de Auth**:
-  - `/auth/login` - Formulario de login
-  - `/auth/register` - Formulario de registro
+**Productos** (`/api/v1/productos/`)
 
-#### Tienda Pública (Nuevo en Parcial 2)
-- **HomeStorePage**
-  - Catálogo responsivo de productos
-  - Filtros por categoría
-  - Búsqueda por nombre/descripción
-  - Cards con imagen, precio, descripción
-  - Botón "Agregar al carrito"
-  - Paginación
+| Metodo | Ruta | Descripcion | Rol requerido |
+|--------|------|-------------|---------------|
+| GET | / | Listado publico con filtros (categoria, disponibilidad, busqueda) y paginacion | - |
+| GET | /{id} | Detalle con categorias e ingredientes | - |
+| POST | / | Crear producto con categorias e ingredientes | ADMIN |
+| PUT | /{id} | Actualizar producto | ADMIN |
+| DELETE | /{id} | Soft delete | ADMIN |
 
-- **CarritoPage**
-  - Tabla de items en carrito
-  - Cantidad ajustable por item
-  - Subtotal por item y total general
-  - Botón "Proceder al checkout"
-  - Carrito vacío - redirige a HomeStorePage
+El stock y la disponibilidad se calculan dinamicamente a partir del stock de ingredientes asociados.
 
-- **CheckoutPage**
-  - Resumen de compra
-  - Selección de dirección de entrega
-  - Selección de forma de pago
-  - Botón "Confirmar pedido"
-  - Confirmación de pedido creado
+**Ingredientes** (`/api/v1/ingredientes/`)
 
-- **MisPedidosPage**
-  - Tabla de pedidos del usuario
-  - Estados con badges (colores distintivos)
-  - Detalles expandibles (ej: productos en pedido)
-  - Filtros por estado
-  - Paginación
+| Metodo | Ruta | Descripcion | Rol requerido |
+|--------|------|-------------|---------------|
+| GET | / | Listado con paginacion | - |
+| GET | /{id} | Detalle | - |
+| POST | / | Crear ingrediente | ADMIN |
+| PUT | /{id} | Actualizar (incluye stock) | ADMIN |
+| DELETE | /{id} | Soft delete | ADMIN |
 
-#### Panel Administrativo (Nuevo en Parcial 2)
-**Gestión de Categorías (CategoriasPage)**
-- CRUD completo (Create, Read, Update, Delete)
-- Modal para crear/editar
-- Tabla responsiva con acciones
-- Soporte para subcategorías (parent_id)
+Incluye campos `stock_cantidad`, `unidad_medida_codigo` y `es_alergeno`.
 
-**Gestión de Productos (ProductsPage)**
-- CRUD completo con modal
-- Grid/tabla responsiva
-- Campos: nombre, descripción, precio, stock, disponibilidad
-- Soporte para múltiples imágenes (array)
-- Asociación con ingredientes
+**Unidades de medida y catalogos** (`/api/v1/ingredientes/unidades-medida/`)
 
-**Gestión de Ingredientes (IngredientesPage)**
-- CRUD completo
-- Indicadores visuales para alergenos
-- Tabla con propiedades
+| Metodo | Ruta | Descripcion | Rol requerido |
+|--------|------|-------------|---------------|
+| GET | / | Listar unidades de medida | - |
+| POST | / | Crear unidad de medida | ADMIN, STOCK |
+| DELETE | /{codigo} | Eliminar unidad de medida | ADMIN, STOCK |
 
-**PedidosPageRefactored**
-- Vista de todos los pedidos (solo ADMIN)
-- Estados con badges
-- Información: usuario, estado, total, forma de pago, fecha
-- Detalles del pedido (productos + precios)
-- Manejo de paginación
+**Pedidos** (`/api/v1/pedidos/`)
 
-#### Autenticación y Protección (Nuevo en Parcial 2)
-- **Auth Store (Zustand)**
-  - `useAuthStore`: Estado global de autenticación
-  - Token JWT almacenado en localStorage
-  - Usuario logueado con rol asociado
-  - Funciones: login, logout, register
+| Metodo | Ruta | Descripcion | Rol requerido |
+|--------|------|-------------|---------------|
+| GET | / | Listar pedidos (CLIENT ve solo los propios) | Autenticado |
+| GET | /{id} | Detalle del pedido | Autenticado |
+| POST | / | Crear pedido desde checkout (valida stock, calcula totales, descuenta ingredientes) | Autenticado |
+| PUT | /{id} | Actualizar pedido (notas, costo de envio) | ADMIN, PEDIDOS |
+| DELETE | /{id} | Soft delete | ADMIN, PEDIDOS |
+| POST | /{id}/transition-estado | Avanzar estado (FSM validado) | Autenticado |
+| GET | /{id}/detalles | Detalles del pedido con snapshots | Autenticado |
+| POST | /{id}/detalles | Agregar detalle | ADMIN, PEDIDOS |
+| GET | /{id}/pagos | Listar pagos | Autenticado |
+| POST | /{id}/pagos | Registrar pago | ADMIN, PEDIDOS |
+| PUT | /{id}/pagos/{pago_id} | Actualizar pago | ADMIN, PEDIDOS |
 
-- **ProtectedRoute**
-  - Componente que valida autenticación
-  - Redirige a /auth/login si no está autenticado
-  - Valida roles si es necesario
+**Maquina de estados (FSM):**
 
-- **Navbar Actualizado**
-  - Links dinámicos según autenticación
-  - Mostrar usuario logueado
-  - Botón logout
-  - Links a admin si es ADMIN
-  - Estilos hover y animaciones
+```
+PENDIENTE --> CONFIRMADO --> EN_PREP --> EN_CAMINO --> ENTREGADO
+    |              |            |
+    v              v            v
+CANCELADO     CANCELADO    CANCELADO
+```
 
-#### State Management (Zustand)
-- **useCarritoStore**: Gestión del carrito
-  - Agregar/remover items
-  - Actualizar cantidades
-  - Calcular total
-  - Limpiar carrito después de checkout
+- La cancelacion requiere motivo obligatorio.
+- El CLIENT solo puede cancelar sus propios pedidos (desde PENDIENTE o CONFIRMADO).
+- Cada transicion genera un registro en `HistorialEstadoPedido` (append-only).
 
-- **useAuthStore**: Gestión de autenticación
-  - Token y usuario actual
-  - Login/logout/register
-  - Validar autenticación
+**Direcciones de entrega** (`/api/v1/direcciones/`)
 
-#### Custom Hooks (Nuevo en Parcial 2)
-- `useCategorias`: Cargar categorías con paginación
-- `useProductos`: Cargar productos con filtros
-- `useIngredientes`: Cargar ingredientes
-- `usePedidos`: Cargar pedidos del usuario
+| Metodo | Ruta | Descripcion | Rol requerido |
+|--------|------|-------------|---------------|
+| GET | / | Listar direcciones del usuario autenticado | Autenticado |
+| POST | / | Crear direccion | Autenticado |
+| PUT | /{id} | Actualizar direccion | Autenticado |
+| DELETE | /{id} | Soft delete | Autenticado |
+| PATCH | /{id}/principal | Marcar como principal | Autenticado |
 
-#### Componentes Reutilizables
-- **Navbar**: Navegación principal con links dinámicos
-- **CategoriaCard**: Card de categoría
-- **ProductoTable/ProductoModal**: CRUD de productos
-- **IngredienteTable/IngredienteFormSimple**: CRUD de ingredientes
-- **PedidoTable/PedidoFormSimple**: CRUD de pedidos
-- **ProtectedRoute**: Protección de rutas por auth + rol
-- **Modales genéricos**: Para crear/editar items
+**Administracion** (`/api/v1/admin/`)
 
-#### Diseño con Tailwind CSS
-- Componentes responsivos (mobile-first)
-- Tema profesional blue/gray
-- Validación en formularios
-- Indicadores de loading
-- Mensajes de error/éxito
-- Animations y transitions suaves
+| Metodo | Ruta | Descripcion | Rol requerido |
+|--------|------|-------------|---------------|
+| GET | /usuarios | Listado paginado con filtro por rol | ADMIN |
+| PUT | /usuarios/{id} | Actualizar usuario | ADMIN |
+| DELETE | /usuarios/{id} | Soft delete | ADMIN |
+| POST | /usuarios/{id}/roles | Asignar rol | ADMIN |
 
----
+### Modelo de datos
 
-## Estructura de Respuestas
+**Relaciones principales:**
 
-### Respuesta exitosa con paginación:
+- Producto - Categoria: N:N mediante `ProductoCategoriaLink` (campo extra `es_principal`)
+- Producto - Ingrediente: N:N mediante `ProductoIngredienteLink` (campos extra `cantidad`, `es_removible`)
+- Categoria - Categoria: autorreferencia con `parent_id` (subcategorias)
+- Usuario - Rol: N:N mediante `UsuarioRolLink` (campos extra `asignado_por_id`, `expires_at`)
+- Pedido - DetallePedido: 1:N
+- Pedido - Pago: 1:N
+- Pedido - HistorialEstadoPedido: 1:N
+- Usuario - DireccionEntrega: 1:N
+
+**Catalogos (tablas de referencia):**
+
+- `UnidadMedida`: kg, g, l, ml, u, oz, lb, taza, cda, cdta
+- `FormaPago`: MERCADOPAGO, EFECTIVO, TRANSFERENCIA
+- `EstadoPedido`: PENDIENTE, CONFIRMADO, EN_PREP, EN_CAMINO, ENTREGADO, CANCELADO
+
+### Seed de datos
+
+El backend ejecuta automaticamente al iniciar:
+
+1. Creacion de tablas (si no existen)
+2. Seed de roles (ADMIN, STOCK, PEDIDOS, CLIENT)
+3. Seed de catalogos (unidades de medida, formas de pago, estados de pedido)
+4. Seed de usuarios de prueba
+5. Seed de datos de ejemplo (ingredientes, categorias, productos con recetas)
+
+**Usuarios de prueba:**
+
+| Email | Contrasena | Roles |
+|-------|-----------|-------|
+| admin@admin.com | admin123 | ADMIN |
+| cliente@test.com | cliente123 | CLIENT |
+| empleado@tienda.com | empleado123 | PEDIDOS |
+| gerente@tienda.com | gerente123 | STOCK |
+
+### Respuestas estandarizadas
+
+Todas las respuestas siguen el formato:
+
 ```json
 {
   "success": true,
-  "message": "Categorías obtenidas exitosamente",
+  "message": "Productos obtenidos exitosamente",
   "data": {
-    "items": [...],
+    "items": [],
     "total": 15,
     "limit": 10,
     "offset": 0
@@ -402,136 +300,87 @@ La aplicación estará disponible en `http://localhost:5173`
 }
 ```
 
-### Respuesta de error:
-```json
-{
-  "success": false,
-  "message": "Categoría no encontrada",
-  "data": null,
-  "status_code": 404
-}
-```
+### Configuracion y seguridad
+
+- CORS configurado para `localhost:5173`, `localhost:5174`, `localhost:5175`
+- bcrypt para hash de contrasenas (cost factor >= 12)
+- JWT con PyJWT: access token en cookie httpOnly (30 minutos)
+- API REST documentada automaticamente en `/docs` (Swagger UI) y `/redoc`
 
 ---
 
-## Pruebas de la API
+## Frontend - Tienda publica
 
-Usa el archivo `backend/api.http` para probar los endpoints con:
-- **Visual Studio Code**: Extensión "REST Client" (REST Client Extension)
-- **Postman**: Importar y ejecutar
-- **Insomnia**: Importar y ejecutar
+### Modulos implementados
 
-Incluye ejemplos de:
-- CRUD de Categorías (con parent_id para subcategorías)
-- CRUD de Productos (con imagenes_url array y stock_cantidad)
-- Paginación (limit y offset)
-- Soft deletes
+**Home Store:** catalogo de productos con filtros por categoria, busqueda por nombre y paginacion.
 
----
+**Detalle de producto:** vista individual con ingredientes, alergenos y boton de agregar al carrito.
 
-## Notas Importantes
+**Carrito:** tabla de items con cantidades ajustables, subtotales y total general. Persistencia en localStorage con middleware persist de Zustand.
 
-### Base de Datos
-- SQLite en memoria (desarrollo)
-- Fácilmente configurable a PostgreSQL en `app/core/database.py`
+**Checkout:** seleccion de direccion de entrega, forma de pago y confirmacion del pedido. El pedido se crea en una transaccion atomica (Unit of Work) que valida stock, calcula totales, crea detalles con snapshot y descuenta ingredientes.
 
-### Frontend
-- Conecta automáticamente a `http://localhost:8000`
-- Manejo de respuestas estandarizadas con paginación
-- HMR (Hot Module Reload) habilitado con Vite
+**Mis pedidos:** historial de pedidos del usuario con estados, detalles expandibles y paginacion.
 
-### Backend
-- FastAPI dev mode con auto-reload
-- Validación con Pydantic
-- Documentación automática en `/docs`
+**Cajero:** pantalla de empleado para avanzar estados de pedidos (confirmar, preparar, enviar, entregar).
 
-### Auditoría y Soft Deletes
-- Los registros **nunca se borran físicamente**
-- El campo `deleted_at` marca la eliminación lógica
-- Todas las queries filtran automáticamente `deleted_at IS NULL`
-- Útil para reportes y auditoría
+### Gestion de estado
 
-### Jerarquía de Categorías
-- Campo `parent_id` permite categorías padre/hijas
-- Auto-referencia en la tabla Categoria
-- Ejemplo: "Alimentos" (padre) -> "Bebidas" (hija)
+- `useAuthStore` (Zustand): autenticacion, usuario actual, login/logout/register.
+- `useCarritoStore` (Zustand): items del carrito con persist en localStorage.
+- TanStack Query: `useQuery` para listados, `useMutation` para altas/ediciones con invalidacion de cache (`invalidateQueries`).
+
+### Navegacion
+
+- React Router v6 con rutas publicas y protegidas.
+- `ProtectedRoute` valida autenticacion y roles.
+- Parametros dinamicos en la URL (ej: `/store/producto/:id`).
 
 ---
 
-## Comparativa: TP Integrador (P4_P1) vs Parcial 2 (P4_P2)
+## Frontend - Panel administrativo
 
-| Feature | P4_P1 (TP Integrador) | P4_P2 (Parcial 2) |
-|---------|----------------------|-------------------|
-| **Autenticación** | No | Yes - JWT + RBAC |
-| **Usuarios y Roles** | No | Yes - ADMIN, GERENTE, REPARTIDOR, CLIENTE |
-| **Categorías** | Yes - CRUD básico | Yes - CRUD + Jerarquía (parent_id) |
-| **Productos** | Yes - CRUD básico | Yes - CRUD + Relaciones M2M |
-| **Ingredientes** | No | Yes - CRUD + Alergenos |
-| **Pedidos** | No | Yes - CRUD + FSM + Snapshots + Pagos |
-| **Direcciones** | No | Yes - CRUD + Validación |
-| **Admin Panel** | No | Yes - Estadísticas + Gestión global |
-| **Tienda Pública** | No | Yes - HomeStore + Carrito + Checkout |
-| **State Management** | No | Yes - Zustand (Auth + Carrito) |
-| **Custom Hooks** | No | Yes - useCategorias, useProductos, etc. |
-| **ProtectedRoute** | No | Yes - Validación Auth + Rol |
-| **Frontend Routing** | Básico | Yes - React Router v6 con guards |
-| **API Versionamiento** | `/categorias` | Yes - `/api/v1/categorias` |
-| **Unit of Work** | No | Yes - Context manager |
-| **Repository Pattern** | No | Yes - BaseRepository genérico |
-| **Soft Deletes** | Yes | Yes (mejorado) |
-| **Response Envelope** | Yes - Básico | Yes - StandardResponse mejorado |
-| **Frontend Build** | No (manual) | Yes - Vite + HMR |
-| **Tailwind CSS** | No | Yes (diseño responsivo) |
+### Modulos implementados
 
----
+**Login:** autenticacion para empleados. Redireccion segun rol (ADMIN/PEDIDOS a pedidos, STOCK a productos).
 
-## Stack Tecnológico
+**Categorias:** CRUD completo con soporte para subcategorias (parent_id).
 
-| Capa | Tecnología | Versión |
-|------|-----------|---------|
-| **Backend** | FastAPI | 0.100+ |
-| **BD** | SQLModel / SQLAlchemy | 2.0+ |
-| **Auth** | PyJWT | 2.8+ |
-| **Password Hash** | Passlib + bcrypt | — |
-| **Frontend** | React | 18.2+ |
-| **Router** | React Router | 6.20+ |
-| **State** | Zustand | 4.4+ |
-| **Tipos** | TypeScript | 5.2+ |
-| **Estilos** | Tailwind CSS | 3.4+ |
-| **HTTP Client** | Axios | 1.6+ |
-| **Build** | Vite | 5.0+ |
+**Productos:** CRUD completo con asignacion de categorias e ingredientes. Imagenes multiples (array de URLs).
+
+**Ingredientes:** CRUD completo con gestion de stock, unidades de medida y marcado de alergenos. Gestion de unidades de medida (crear/eliminar).
+
+**Pedidos:** listado de todos los pedidos con detalle, estados y transiciones.
+
+### Diferenciacion por rol
+
+- ADMIN: acceso completo, ve columnas ID y acciones en todas las tablas.
+- STOCK: acceso a productos e ingredientes en modo lectura (sin columnas ID ni acciones).
+- PEDIDOS: acceso a pedidos con transiciones de estado.
+
+### Componentes
+
+- Tablas con TanStack Table: ordenamiento, filtro global, paginacion y columnas condicionales segun rol.
+- Toast: notificaciones de exito/error con auto-cierre.
+- ConfirmDialog: dialogo modal de confirmacion (reemplaza `window.confirm`).
+- Formularios con validacion.
 
 ---
 
-## Comparativa: Requisitos Entregables
+## Stack tecnologico
 
-### TP Integrador (P4_P1)
-- Categorías CRUD
-- Productos CRUD
-- Relación Producto-Categoría (M2M)
-- SQLModel + SQLAlchemy
-- FastAPI con documentación automática
-- Paginación en listados
-- Validación con Pydantic
-
-### Parcial 2 (P4_P2) - Todos los de P4_P1 PLUS:
-- **Autenticación JWT**
-- **RBAC con roles**
-- **Módulo Usuarios**
-- **Módulo Ingredientes**
-- **Módulo Pedidos con FSM**
-- **Módulo Direcciones**
-- **Pedidos con Detalles + Snapshots**
-- **Sistema de Pagos (estructura)**
-- **Panel Administrativo**
-- **Tienda Pública (HomeStore + Carrito + Checkout)**
-- **MisPedidos (historial de usuario)**
-- **Frontend React + TypeScript + Vite**
-- **State Management (Zustand)**
-- **Routing protegido (ProtectedRoute)**
-- **Unit of Work Pattern**
-- **Repository Pattern**
-- **API Versionamiento (/api/v1/)**
-- **Tailwind CSS**
-- **Refactoring de routers** (limpieza de código)
-
+| Capa | Tecnologia |
+|------|-----------|
+| Backend | FastAPI |
+| Base de datos | PostgreSQL + SQLModel (SQLAlchemy 2.0) |
+| Autenticacion | PyJWT + bcrypt |
+| Frontend | React 18 + TypeScript |
+| Routing | React Router v6 |
+| Estado global | Zustand |
+| Estado de servidor | TanStack Query |
+| Tablas | TanStack Table |
+| Validacion frontend | Zod |
+| Estilos | Tailwind CSS |
+| HTTP Client | Axios |
+| Build | Vite |
